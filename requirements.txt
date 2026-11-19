@@ -1,0 +1,5 @@
+# CPU-only is enough. On aarch64 use torch 2.10: 2.11+ ships a CUDA wheel there
+# and pulls ~2 GB of nvidia-* packages that cannot load without a GPU.
+torch==2.10.0
+numpy
+pillow

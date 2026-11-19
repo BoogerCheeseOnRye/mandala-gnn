@@ -1,0 +1,79 @@
+{
+  "config": {
+    "drawing": "drawings/hex-tessellation.jpg",
+    "mesh": "none",
+    "task": "recon",
+    "dim": 64,
+    "depth": 1,
+    "blocks": 2,
+    "heads": 4,
+    "harmonics": 4,
+    "rbf_bins": 8,
+    "cell": 0.125,
+    "dropout": 0.1,
+    "edge_gate": true,
+    "round_patches": false,
+    "mask_ratio": 0.2,
+    "n_sectors": 8,
+    "val_sector": 0,
+    "sparsity": 0.001,
+    "lr": 0.003,
+    "weight_decay": 0.005,
+    "steps": 400,
+    "seed": 1,
+    "out": "runs/mlp-1",
+    "threads": 1
+  },
+  "metrics": {
+    "train_mse": 0.1328878253698349,
+    "val_mse": 0.0723300576210022,
+    "wedge_mse": 0.02855944074690342,
+    "val_corr": 0.0,
+    "wedge_corr": 0.0,
+    "mean_baseline_val_mse": 0.07241719216108322,
+    "mean_baseline_wedge_mse": 0.030414124950766563,
+    "gate_mean": 0.0,
+    "level_weights": [
+      1.0
+    ],
+    "depth_used": 1,
+    "params": 148012,
+    "nodes": 196,
+    "edges": 0,
+    "seconds": 18.8
+  },
+  "history": [
+    [
+      0,
+      0.8775838017463684
+    ],
+    [
+      50,
+      0.05805743858218193
+    ],
+    [
+      100,
+      0.07814028859138489
+    ],
+    [
+      150,
+      0.08025004714727402
+    ],
+    [
+      200,
+      0.05534835532307625
+    ],
+    [
+      250,
+      0.06017104163765907
+    ],
+    [
+      300,
+      0.05390854552388191
+    ],
+    [
+      350,
+      0.056864138692617416
+    ]
+  ]
+}

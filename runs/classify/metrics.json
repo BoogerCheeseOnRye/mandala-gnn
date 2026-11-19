@@ -1,0 +1,33 @@
+{
+  "config": {
+    "drawing": "drawings/star-mandala.jpg",
+    "mesh": "hex",
+    "task": "classify",
+    "dim": 64,
+    "depth": 3,
+    "blocks": 2,
+    "heads": 4,
+    "harmonics": 4,
+    "rbf_bins": 8,
+    "cell": 0.125,
+    "dropout": 0.1,
+    "edge_gate": true,
+    "mask_ratio": 0.2,
+    "n_sectors": 8,
+    "val_sector": 0,
+    "sparsity": 0.001,
+    "lr": 0.003,
+    "weight_decay": 0.005,
+    "steps": 150,
+    "seed": 0,
+    "out": "runs/classify",
+    "threads": 1
+  },
+  "metrics": {
+    "train_acc": 1.0,
+    "test_acc": 1.0,
+    "train_loss": 0.0005876513314433396,
+    "params": 405278,
+    "seconds": 187.7
+  }
+}

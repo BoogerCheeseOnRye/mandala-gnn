@@ -1,0 +1,701 @@
+{
+  "base": {
+    "drawing": "drawings/hex-tessellation.jpg",
+    "mesh": "hex",
+    "task": "recon",
+    "dim": 64,
+    "depth": 3,
+    "blocks": 2,
+    "heads": 4,
+    "harmonics": 4,
+    "rbf_bins": 8,
+    "cell": 0.125,
+    "dropout": 0.1,
+    "edge_gate": true,
+    "round_patches": false,
+    "mask_ratio": 0.2,
+    "n_sectors": 8,
+    "val_sector": 0,
+    "sparsity": 0.001,
+    "lr": 0.003,
+    "weight_decay": 0.005,
+    "steps": 300,
+    "seed": 0,
+    "out": "",
+    "threads": 1
+  },
+  "table": {
+    "harmonics": {
+      "2": {
+        "val_mse": {
+          "mean": 0.0025440705940127373,
+          "sd": 0.0016176612417544032
+        },
+        "wedge_mse": {
+          "mean": 0.003404479008167982,
+          "sd": 4.3986163321689765e-05
+        },
+        "params": 401886,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.8698909878730774,
+          "sd": 0.0012670185599344963
+        },
+        "gate_mean": {
+          "mean": 0.30054692924022675,
+          "sd": 0.020271727976497046
+        },
+        "seconds": 147.6
+      },
+      "0": {
+        "val_mse": {
+          "mean": 0.03942165523767471,
+          "sd": 0.00669535879238754
+        },
+        "wedge_mse": {
+          "mean": 0.012831924483180046,
+          "sd": 0.0018053207432936669
+        },
+        "params": 398430,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.23817711230367422,
+          "sd": 0.3186874220164378
+        },
+        "gate_mean": {
+          "mean": 0.3498035669326782,
+          "sd": 0.04436078031632278
+        },
+        "seconds": 147.8
+      },
+      "4": {
+        "val_mse": {
+          "mean": 0.002878018538467586,
+          "sd": 0.0004153122464121909
+        },
+        "wedge_mse": {
+          "mean": 0.0032424582168459892,
+          "sd": 0.0007689188724264009
+        },
+        "params": 405342,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.8883408904075623,
+          "sd": 0.014481488560949145
+        },
+        "gate_mean": {
+          "mean": 0.32746925950050354,
+          "sd": 0.045511009959033594
+        },
+        "seconds": 147.5
+      },
+      "8": {
+        "val_mse": {
+          "mean": 0.00228394300211221,
+          "sd": 0.0005066066008260892
+        },
+        "wedge_mse": {
+          "mean": 0.0026526583824306726,
+          "sd": 0.00013656204534812249
+        },
+        "params": 412254,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.9012143313884735,
+          "sd": 0.0007702336565365884
+        },
+        "gate_mean": {
+          "mean": 0.25171882659196854,
+          "sd": 0.022132521874965144
+        },
+        "seconds": 145.7
+      }
+    },
+    "depth": {
+      "1": {
+        "val_mse": {
+          "mean": 0.002679928205907345,
+          "sd": 0.0007459603645168534
+        },
+        "wedge_mse": {
+          "mean": 0.004079431178979576,
+          "sd": 0.0002773725259533685
+        },
+        "params": 148012,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.8437334895133972,
+          "sd": 0.01439070424925668
+        },
+        "gate_mean": {
+          "mean": 0.38612474501132965,
+          "sd": 0.007136451903834365
+        },
+        "seconds": 46.9
+      },
+      "2": {
+        "val_mse": {
+          "mean": 0.0021827006712555885,
+          "sd": 5.093644205893938e-05
+        },
+        "wedge_mse": {
+          "mean": 0.0033406266011297703,
+          "sd": 0.0003958906164188915
+        },
+        "params": 276677,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.8768293857574463,
+          "sd": 0.019358047521053627
+        },
+        "gate_mean": {
+          "mean": 0.38780178129673004,
+          "sd": 0.01795537932918682
+        },
+        "seconds": 100.8
+      },
+      "3": {
+        "val_mse": {
+          "mean": 0.002878018538467586,
+          "sd": 0.0004153122464121909
+        },
+        "wedge_mse": {
+          "mean": 0.0032424582168459892,
+          "sd": 0.0007689188724264009
+        },
+        "params": 405342,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.8883408904075623,
+          "sd": 0.014481488560949145
+        },
+        "gate_mean": {
+          "mean": 0.32746925950050354,
+          "sd": 0.045511009959033594
+        },
+        "seconds": 146.9
+      },
+      "4": {
+        "val_mse": {
+          "mean": 0.0018975833663716912,
+          "sd": 0.0003152115055652936
+        },
+        "wedge_mse": {
+          "mean": 0.0031982018845155835,
+          "sd": 0.0009063694589519191
+        },
+        "params": 534007,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.8814906179904938,
+          "sd": 0.030877666302899696
+        },
+        "gate_mean": {
+          "mean": 0.321245402097702,
+          "sd": 0.0065521912163520974
+        },
+        "seconds": 149.7
+      }
+    },
+    "edge_gate": {
+      "True": {
+        "val_mse": {
+          "mean": 0.002878018538467586,
+          "sd": 0.0004153122464121909
+        },
+        "wedge_mse": {
+          "mean": 0.0032424582168459892,
+          "sd": 0.0007689188724264009
+        },
+        "params": 405342,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.8883408904075623,
+          "sd": 0.014481488560949145
+        },
+        "gate_mean": {
+          "mean": 0.32746925950050354,
+          "sd": 0.045511009959033594
+        },
+        "seconds": 147.7
+      },
+      "False": {
+        "val_mse": {
+          "mean": 0.05657947063446045,
+          "sd": 0.016359130662109474
+        },
+        "wedge_mse": {
+          "mean": 0.013978781644254923,
+          "sd": 0.0008485392083472897
+        },
+        "params": 397818,
+        "nodes": 203,
+        "wedge_corr": {
+          "mean": 0.07821475295349956,
+          "sd": 0.13047424720645417
+        },
+        "gate_mean": {
+          "mean": 0.0,
+          "sd": 0.0
+        },
+        "seconds": 115.8
+      }
+    }
+  },
+  "runs": [
+    {
+      "axis": "harmonics",
+      "value": "2",
+      "seed": 0,
+      "train_mse": 0.0015492141246795654,
+      "val_mse": 0.0014002113603055477,
+      "wedge_mse": 0.0033733760938048363,
+      "val_corr": 0.9901642203330994,
+      "wedge_corr": 0.8707869052886963,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.28621265292167664,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 401886,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 147.6
+    },
+    {
+      "axis": "harmonics",
+      "value": "0",
+      "seed": 0,
+      "train_mse": 0.04777638614177704,
+      "val_mse": 0.04415598884224892,
+      "wedge_mse": 0.014108479022979736,
+      "val_corr": 0.6073062419891357,
+      "wedge_corr": 0.012831075116991997,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.31843575835227966,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 398430,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 147.8
+    },
+    {
+      "axis": "harmonics",
+      "value": "0",
+      "seed": 1,
+      "train_mse": 0.0034720124676823616,
+      "val_mse": 0.03468732163310051,
+      "wedge_mse": 0.011555369943380356,
+      "val_corr": 0.8333772420883179,
+      "wedge_corr": 0.46352314949035645,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.3811713755130768,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 398430,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 148.2
+    },
+    {
+      "axis": "harmonics",
+      "value": "4",
+      "seed": 0,
+      "train_mse": 0.002718691946938634,
+      "val_mse": 0.0031716886442154646,
+      "wedge_mse": 0.003786165965721011,
+      "val_corr": 0.9786697030067444,
+      "wedge_corr": 0.8781009316444397,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.3596504032611847,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 405342,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 147.5
+    },
+    {
+      "axis": "harmonics",
+      "value": "2",
+      "seed": 1,
+      "train_mse": 0.0024632448330521584,
+      "val_mse": 0.003687929827719927,
+      "wedge_mse": 0.003435581922531128,
+      "val_corr": 0.9823343753814697,
+      "wedge_corr": 0.8689950704574585,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.31488120555877686,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 401886,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 148.5
+    },
+    {
+      "axis": "harmonics",
+      "value": "4",
+      "seed": 1,
+      "train_mse": 0.0023248528596013784,
+      "val_mse": 0.0025843484327197075,
+      "wedge_mse": 0.0026987504679709673,
+      "val_corr": 0.9877422451972961,
+      "wedge_corr": 0.8985808491706848,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.2952881157398224,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 405342,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 148.1
+    },
+    {
+      "axis": "depth",
+      "value": "1",
+      "seed": 0,
+      "train_mse": 0.0025542927905917168,
+      "val_mse": 0.002152454573661089,
+      "wedge_mse": 0.003883299184963107,
+      "val_corr": 0.9844030737876892,
+      "wedge_corr": 0.8539092540740967,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.3911709785461426,
+      "level_weights": [
+        1.0
+      ],
+      "depth_used": 1,
+      "params": 148012,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 46.9
+    },
+    {
+      "axis": "depth",
+      "value": "1",
+      "seed": 1,
+      "train_mse": 0.0027878673281520605,
+      "val_mse": 0.0032074018381536007,
+      "wedge_mse": 0.004275563172996044,
+      "val_corr": 0.9845560789108276,
+      "wedge_corr": 0.8335577249526978,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.3810785114765167,
+      "level_weights": [
+        1.0
+      ],
+      "depth_used": 1,
+      "params": 148012,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 47.2
+    },
+    {
+      "axis": "harmonics",
+      "value": "8",
+      "seed": 1,
+      "train_mse": 0.001648463774472475,
+      "val_mse": 0.0019257180392742157,
+      "wedge_mse": 0.0025560944341123104,
+      "val_corr": 0.9907518625259399,
+      "wedge_corr": 0.9017589688301086,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.23606877028942108,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 412254,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 145.7
+    },
+    {
+      "axis": "harmonics",
+      "value": "8",
+      "seed": 0,
+      "train_mse": 0.0016596775967627764,
+      "val_mse": 0.002642167964950204,
+      "wedge_mse": 0.002749222330749035,
+      "val_corr": 0.9808198809623718,
+      "wedge_corr": 0.9006696939468384,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.267368882894516,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 412254,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 147.0
+    },
+    {
+      "axis": "depth",
+      "value": "2",
+      "seed": 0,
+      "train_mse": 0.0024592301342636347,
+      "val_mse": 0.002146683167666197,
+      "wedge_mse": 0.0030606896616518497,
+      "val_corr": 0.9847827553749084,
+      "wedge_corr": 0.8905175924301147,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.4004981517791748,
+      "level_weights": [
+        0.5,
+        0.5
+      ],
+      "depth_used": 2,
+      "params": 276677,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 100.8
+    },
+    {
+      "axis": "depth",
+      "value": "2",
+      "seed": 1,
+      "train_mse": 0.0019194839987903833,
+      "val_mse": 0.0022187181748449802,
+      "wedge_mse": 0.003620563540607691,
+      "val_corr": 0.9893971681594849,
+      "wedge_corr": 0.8631411790847778,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.3751054108142853,
+      "level_weights": [
+        0.5,
+        0.5
+      ],
+      "depth_used": 2,
+      "params": 276677,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 102.2
+    },
+    {
+      "axis": "depth",
+      "value": "3",
+      "seed": 0,
+      "train_mse": 0.002718691946938634,
+      "val_mse": 0.0031716886442154646,
+      "wedge_mse": 0.003786165965721011,
+      "val_corr": 0.9786697030067444,
+      "wedge_corr": 0.8781009316444397,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.3596504032611847,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 405342,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 146.9
+    },
+    {
+      "axis": "depth",
+      "value": "3",
+      "seed": 1,
+      "train_mse": 0.0023248528596013784,
+      "val_mse": 0.0025843484327197075,
+      "wedge_mse": 0.0026987504679709673,
+      "val_corr": 0.9877422451972961,
+      "wedge_corr": 0.8985808491706848,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.2952881157398224,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 405342,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 148.1
+    },
+    {
+      "axis": "depth",
+      "value": "4",
+      "seed": 0,
+      "train_mse": 0.002275269478559494,
+      "val_mse": 0.001674695173278451,
+      "wedge_mse": 0.0038391018752008677,
+      "val_corr": 0.9878026247024536,
+      "wedge_corr": 0.859656810760498,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.3258785009384155,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 534007,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 149.7
+    },
+    {
+      "axis": "depth",
+      "value": "4",
+      "seed": 1,
+      "train_mse": 0.0018253972521051764,
+      "val_mse": 0.0021204715594649315,
+      "wedge_mse": 0.0025573018938302994,
+      "val_corr": 0.989905059337616,
+      "wedge_corr": 0.9033244252204895,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.3166123032569885,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 534007,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 150.3
+    },
+    {
+      "axis": "edge_gate",
+      "value": "True",
+      "seed": 0,
+      "train_mse": 0.002718691946938634,
+      "val_mse": 0.0031716886442154646,
+      "wedge_mse": 0.003786165965721011,
+      "val_corr": 0.9786697030067444,
+      "wedge_corr": 0.8781009316444397,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.3596504032611847,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 405342,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 147.7
+    },
+    {
+      "axis": "edge_gate",
+      "value": "True",
+      "seed": 1,
+      "train_mse": 0.0023248528596013784,
+      "val_mse": 0.0025843484327197075,
+      "wedge_mse": 0.0026987504679709673,
+      "val_corr": 0.9877422451972961,
+      "wedge_corr": 0.8985808491706848,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.2952881157398224,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 405342,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 147.0
+    },
+    {
+      "axis": "edge_gate",
+      "value": "False",
+      "seed": 0,
+      "train_mse": 0.04758425056934357,
+      "val_mse": 0.045011818408966064,
+      "wedge_mse": 0.014578789472579956,
+      "val_corr": 0.6149066090583801,
+      "wedge_corr": -0.014044472016394138,
+      "mean_baseline_val_mse": 0.06826037913560867,
+      "mean_baseline_wedge_mse": 0.015358678996562958,
+      "gate_mean": 0.0,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 397818,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 115.8
+    },
+    {
+      "axis": "edge_gate",
+      "value": "False",
+      "seed": 1,
+      "train_mse": 0.008291363716125488,
+      "val_mse": 0.06814712285995483,
+      "wedge_mse": 0.01337877381592989,
+      "val_corr": 0.6202449202537537,
+      "wedge_corr": 0.17047397792339325,
+      "mean_baseline_val_mse": 0.10973379015922546,
+      "mean_baseline_wedge_mse": 0.014291323721408844,
+      "gate_mean": 0.0,
+      "level_weights": [
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "depth_used": 3,
+      "params": 397818,
+      "nodes": 203,
+      "edges": 2092,
+      "seconds": 96.7
+    }
+  ]
+}

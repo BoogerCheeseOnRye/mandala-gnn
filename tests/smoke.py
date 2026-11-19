@@ -1,0 +1,84 @@
+"""Smoke tests, no pytest needed: python tests/smoke.py"""
+from __future__ import annotations
+
+import os
+import sys
+
+import torch
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from mandalanet.data import recon_example
+from mandalanet.lattices import build_mesh
+from mandalanet.model import MandalaNet
+
+DRAWING = "drawings/star-mandala.jpg"
+
+
+def check(cond: bool, msg: str) -> None:
+    if not cond:
+        raise AssertionError(msg)
+    print(f"ok  {msg}")
+
+
+def main() -> None:
+    for kind in ("hex", "grid", "rings", "chart", "random", "jitter", "none"):
+        m = build_mesh(kind, size=64)
+        check(m.pos_px.shape[1] == 2 and m.edge_index.shape[0] == 2,
+              f"{kind}: {m.pos_px.shape[0]} nodes, {m.edge_index.shape[1]} edges")
+        check(bool((m.pos.abs() <= 1.05).all()), f"{kind}: positions normalised")
+        if m.edge_index.numel():
+            check(int(m.edge_index.min()) >= 0 and int(m.edge_index.max()) < m.pos_px.shape[0],
+                  f"{kind}: edge indices in range")
+            check(bool((m.edge_index[0] != m.edge_index[1]).all()), f"{kind}: no self loops")
+
+    ex = recon_example(DRAWING, mesh="hex", size=64, seed=0)
+    check(not bool((ex.train_mask & ex.val_mask).any()), "train/val masks disjoint")
+    check(not bool((ex.train_mask & ex.wedge_mask).any()), "train/wedge masks disjoint")
+    check(bool(ex.wedge_mask.any()) and bool(ex.val_mask.any()), "eval sets non-empty")
+    known = ~(ex.train_mask | ex.val_mask | ex.wedge_mask)
+    check(float(ex.graph.x[~known][:, :-1].abs().max()) == 0.0, "masked cells are zeroed")
+
+    model = MandalaNet(in_dim=ex.patch_dim + 1, out_dim=ex.patch_dim,
+                       dim=32, depth=3, blocks=1, heads=4, harmonics=4)
+    out = model(ex.graph)
+    check(out["node_pred"].shape == ex.target.shape, "reconstruction head shape")
+    check(out["depth_used"] >= 2, "pyramid actually coarsened the graph")
+    check(0.0 < float(out["gate_mean"]) < 1.0, "edge gates in (0,1)")
+    check(abs(float(out["level_weights"].sum()) - 1.0) < 1e-5, "level weights sum to 1")
+    check(torch.isfinite(out["node_pred"]).all(), "no NaNs")
+
+    loss = ((out["node_pred"][ex.train_mask] - ex.target[ex.train_mask]) ** 2).mean()
+    loss.backward()
+    grads = [p.grad for p in model.parameters() if p.grad is not None]
+    check(len(grads) > 0 and all(torch.isfinite(g).all() for g in grads), "gradients finite")
+
+    tiny = MandalaNet(in_dim=ex.patch_dim + 1, out_dim=ex.patch_dim, dim=16, depth=1, blocks=1)
+    check(tiny(ex.graph)["node_pred"].shape == ex.target.shape, "depth=1 works")
+
+    dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
+    mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,
+                     depth=2, blocks=1)
+    o = mlp(dead.graph)
+    check(torch.isfinite(o["node_pred"]).all(), "edgeless (MLP) variant runs")
+    try:
+        from mandalanet.layers import RadialAttention
+        from mandalanet.pyg_adapter import HAS_PYG, GeoConv, from_data, to_data
+
+        check(HAS_PYG, "torch_geometric importable (optional)")
+        attn = RadialAttention(16, ex.patch_dim + 1, heads=2)
+        ef = torch.randn(ex.graph.num_edges, attn.bias[0].in_features)
+        pure, _ = attn(ex.graph.x[:, :16], ex.graph, ef)
+        conv = GeoConv(attn, ef.shape[1])
+        wrapped = conv(to_data(ex.graph).x[:, :16], ex.graph.edge_index, ef)
+        check(float((pure - wrapped).abs().max()) < 1e-6, "PyG wrapper matches pure torch")
+        check(from_data(to_data(ex.graph)).num_nodes == ex.graph.num_nodes,
+              "Graph <-> PyG Data roundtrip")
+    except ImportError as err:
+        print(f"skip  torch_geometric ({err})")
+
+    print("\nall smoke tests passed")
+
+
+if __name__ == "__main__":
+    main()

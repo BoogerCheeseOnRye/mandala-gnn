@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07080c">
+<title>Mandala-GNN — paper</title>
+<link rel="stylesheet" href="paper.css">
+<style>
+  body { overflow: auto; padding: 0 0 60px; }
+  .paper-top {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px max(16px, calc((100vw - 1120px) / 2));
+    background: rgba(7, 8, 12, .85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 12px;
+  }
+  .paper-top a { color: var(--ink-dim); }
+  .paper-top a:hover { color: var(--ink); }
+  .paper-top .sp { margin-left: auto; }
+  .paper { padding: 18px 16px 0; }
+  .paper-sheet { max-width: 1040px; }
+  @media (max-width: 780px) {
+    .paper-sheet { padding: 22px 18px; }
+    .paper-cols { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="paper-top">
+  <a href="./">← Mandala-GNN</a>
+  <span class="sp"></span>
+  <a href="https://github.com/BoogerCheeseOnRye/mandala-gnn">Source ↗</a>
+</div>
+<section class="paper" id="paper">
+      <div class="paper-sheet">
+
+        <div class="paper-head">
+          <div class="paper-id">arXiv:2604.00042 [cs.LG] · 18 Nov 2026</div>
+          <h1>Mandala-GNN: masked-patch reconstruction on hand-drawn lattices</h1>
+          <div class="authors">A. Author<sup>1</sup> &nbsp;·&nbsp; B. Author<sup>1,2</sup></div>
+          <div class="affil"><sup>1</sup>Independent &nbsp; <sup>2</sup>On-device systems group</div>
+          <div class="paper-meta">
+            <span>203 nodes</span><span>2,092 edges</span><span>405,342 parameters</span><span>88 s CPU training</span>
+          </div>
+        </div>
+
+        <div class="abstract">
+          <h2>Abstract</h2>
+          <p>
+            We study whether a small graph neural network can redraw the parts of a hand-drawn
+            mandala it has never been allowed to see. The drawing is tiled by a hexagonal mesh,
+            each node owns one 8×8 pixel patch, and a contiguous 45° sector — the wedge — is
+            removed from every optimisation step. The model must reconstruct that sector from the
+            remaining seven eighths. On a consumer phone CPU, a 405k-parameter network reaches
+            r = 0.904 on the held-out wedge (MSE 0.00268, against a 0.01536 mean-patch floor),
+            in 88 seconds of single-threaded training. Ablations show that angular harmonics in
+            the edge messages, not the specific lattice, carry the gain: replacing the hexagonal
+            mesh with a square grid changes r by less than 0.01, while removing the edge features
+            or the edge gate collapses reconstruction. We release the checkpoint, the four
+            drawings and a live browser demo in which the topology and the gates are visible
+            while inference runs.
+          </p>
+        </div>
+
+        <div class="paper-cols">
+
+          <div class="col">
+            <h2>1. The idea</h2>
+            <p>
+              A mandala is a drawing that repeats itself around a centre. If a model can exploit
+              that repetition, hiding a slice of the drawing should not hide information: the
+              slice is implied by the rest. If it cannot, the best it can do is paint the average
+              patch, and the slice is lost.
+            </p>
+            <p>
+              So the task is deliberately adversarial to memorisation. Three disjoint evaluation
+              sets are carved from the same image: random <em>train</em> cells, different random
+              <em>val</em> cells, and a contiguous <em>wedge</em> of 1/8 of the circle that is
+              excluded from training entirely. The wedge is the only number we care about.
+            </p>
+
+            <h2>2. Model</h2>
+            <p>
+              The image is 128×128 and greyscale. A hexagonal lattice with cell size 1/8 places
+              203 nodes over it; each node samples an 8×8 window, pooled to a 4×4 patch, so a node
+              carries 16 intensities plus a visibility flag. Edges connect lattice neighbours
+              (2,092 directed edges), and each edge is typed by its direction on the hex grid.
+            </p>
+            <p>
+              The network runs two anisotropic message-passing blocks per level over a
+              three-level spatial pyramid: it coarsens the mesh twice, then climbs back,
+              fusing coarse context into the fine grid at every step. Edge
+              messages are modulated by the edge type through a small set of <em>angular
+              harmonics</em> — a Fourier basis over the six hex directions — plus an RBF encoding
+              of relative position. A learned gate multiplies every edge message, so the model can
+              close an edge it does not trust. Four attention heads split the 64 channels; each
+              head learns its own gate, and the demo colours every edge by the head that routes the
+              most attention through it. A shared patch head decodes 16 values per node.
+            </p>
+            <p>
+              Training is plain PyTorch, no graph library in the critical path, Adam at 3e-3,
+              400 steps, dropout 0.1, one CPU thread. The whole run is 88 seconds on the phone
+              that serves this page.
+            </p>
+
+            <figure class="paper-fig">
+              <img src="img/recon.png" alt="Four panels: the drawing, the masked input, the prediction, and the composite">
+              <figcaption><b>Figure 1.</b> Left to right: the drawing; what the model is
+              given (black = hidden); the predicted patches alone; the composite that
+              this page reconstructs live. All four panels are 128×128, shown at 3×.</figcaption>
+            </figure>
+
+            <h2>3. Why a wedge</h2>
+            <p>
+              Random masking leaks: a hidden cell is usually surrounded by visible ones, and a
+              local smoother can interpolate it. A contiguous sector cannot be interpolated from
+              its immediate neighbourhood — information has to travel around the circle, which is
+              exactly what message passing is for. The wedge metric therefore separates
+              “interpolation” from “symmetry completion”.
+            </p>
+          </div>
+
+          <div class="col">
+            <h2>4. Results</h2>
+            <table class="paper-table">
+              <thead><tr><th>Run</th><th>wedge r ↑</th><th>wedge MSE ↓</th></tr></thead>
+              <tbody>
+                <tr class="hl"><td>hex mesh, 400 steps (this demo)</td><td>0.904</td><td>0.00268</td></tr>
+                <tr><td>hex mesh, 2 seeds</td><td>0.896</td><td>0.00280</td></tr>
+                <tr><td>same nodes, rewired edges</td><td>0.878</td><td>0.00325</td></tr>
+                <tr><td>square grid mesh</td><td>0.960</td><td>0.00235</td></tr>
+                <tr><td>star mandala + rings (61 nodes)</td><td>0.742</td><td>0.00553</td></tr>
+                <tr><td>no edges (spatial pooling only)</td><td>0.730</td><td>0.01770</td></tr>
+                <tr><td>strict MLP, depth 1, no edges</td><td>0.000</td><td>0.02860</td></tr>
+                <tr><td>mean-patch floor</td><td>—</td><td>0.01536</td></tr>
+              </tbody>
+            </table>
+            <p class="caption">
+              The grid “win” is a tiling artefact. With circular patches, hex (0.989) and square
+              grid (0.990) are indistinguishable, and the no-edge control falls to 0.882 —
+              the lattice is not the source of the gain.
+            </p>
+
+            <table class="paper-table small">
+              <thead><tr><th>Knob</th><th>wedge r</th></tr></thead>
+              <tbody>
+                <tr><td>harmonics 0 / 2 / 4 / 8</td><td>0.238 / 0.870 / 0.888 / 0.901</td></tr>
+                <tr><td>depth 1 / 2 / 3 / 4</td><td>0.844 / 0.877 / 0.888 / 0.881</td></tr>
+                <tr><td>edge gate on / off</td><td>0.888 / 0.078</td></tr>
+              </tbody>
+            </table>
+
+            <h2>5. Live demo</h2>
+            <p>
+              The cockpit behind this sheet runs the checkpoint in the browser's host process.
+              Ask it to hide a sector, or just say hello: the server masks cells, performs one
+              forward pass, and returns the predicted patches, every per-head edge gate, and a
+              BFS hop count from the nearest visible cell. The canvas colours each edge by its
+              dominant head, the meters on the right show each head's share of the attention in
+              that pass, and a wave of halos
+              travels outward from the visible cells by hop distance — the visible half of the
+              computation, not a replay.
+            </p>
+
+            <h2>6. Limitations</h2>
+            <ul class="limits">
+              <li>One drawing per run; the checkpoint is not a general model.</li>
+              <li>Single seed for the demo run; the 2-seed table is the honest estimate.</li>
+              <li>The edge-gate ablation also removes attention damping, so it is confounded.</li>
+              <li>Spatial pooling alone reaches 0.73; most of the score is not message passing.</li>
+              <li>The target is low-frequency: a node predicts a 4×4 average of an 8×8 window,
+                  so local ink density explains much of the variance.</li>
+              <li>“r” on a mostly blank wedge is flattered by large empty regions.</li>
+              <li>The chat is a command line with manners, not a language model: it maps your
+                  words to a masking experiment and then reports the measurement.</li>
+            </ul>
+
+            <h2>7. Reproduction</h2>
+            <pre class="code">pip install -r requirements.txt
+python -m mandalanet.train \
+  --drawing drawings/hex-tessellation.jpg \
+  --mesh hex --steps 400 --out runs/main-hex
+python -m mandalanet.serve --port 8000</pre>
+            <p class="caption">
+              Source, runs and this page: <a class="mono" href="https://github.com/BoogerCheeseOnRye/mandala-gnn">github.com/BoogerCheeseOnRye/mandala-gnn</a>.
+              No GPU, no graph library, no build step.
+            </p>
+          </div>
+        </div>
+
+        <div class="paper-foot">
+          <span>Preprint. Work in progress — numbers from a single phone, not a cluster.</span>
+          <span class="mono">mandala-gnn · 2026</span>
+        </div>
+      </div>
+    </section>
+</body>
+</html>

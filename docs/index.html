@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07080c">
+<title>Mandala-GNN — masked-patch reconstruction on hand-drawn lattices</title>
+<meta name="description" content="A 405k-parameter geometric GNN that redraws the 45° wedge of a hand-drawn mandala it was never trained on. Checkpoint, ablations and a live cockpit.">
+<meta property="og:title" content="Mandala-GNN">
+<meta property="og:description" content="Masked-patch reconstruction on a hand-drawn mandala: r = 0.904 on a wedge never seen in training, 88 s on a phone CPU.">
+<meta property="og:image" content="img/cockpit.jpg">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="./">
+    <span class="mark" aria-hidden="true"></span>
+    <span>MANDALA<span class="dash">-</span>GNN</span>
+  </a>
+  <nav>
+    <a href="#results">Results</a>
+    <a href="paper.html">Paper</a>
+    <a href="#run">Run it</a>
+    <a class="code-link" href="https://github.com/BoogerCheeseOnRye/mandala-gnn">Code ↗</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="hero">
+  <p class="eyebrow">Research prototype · on-device · November 2026</p>
+  <h1>Can a small graph network redraw the part of a mandala it was never allowed to see?</h1>
+  <p class="lede">
+    A 128×128 hand drawing is tiled by a hexagonal mesh — 203 cells, 2,092 directed edges.
+    One contiguous 45° wedge is removed from every training step. A 405k-parameter
+    geometric GNN, with symmetry-aware edge features and a learned gate per edge,
+    reconstructs it from the other seven eighths in 88 seconds of single-threaded CPU
+    training.
+  </p>
+
+  <div class="stats">
+    <div><b>0.904</b><span>held-out wedge r</span></div>
+    <div><b>0.00268</b><span>wedge MSE</span></div>
+    <div><b>0.01536</b><span>mean-patch floor</span></div>
+    <div><b>405,342</b><span>parameters</span></div>
+    <div><b>88 s</b><span>CPU training</span></div>
+  </div>
+</section>
+
+<figure class="shot">
+  <img src="img/cockpit.jpg" alt="The cockpit mid-pass: the topology on the left with head-coloured edges and halos, chat in the middle, attention meters on the right.">
+  <figcaption>
+    The live cockpit, captured mid-pass. Edges are coloured by the attention head that
+    carries the most attention through them; the badge names the head currently sweeping;
+    the halo wave follows BFS hop distance from visible cells; the right rail shows each
+    head's share of the attention, the hop histogram and the measured numbers.
+  </figcaption>
+</figure>
+
+<section class="band">
+  <h2>What the demo actually does</h2>
+  <div class="cols3">
+    <article>
+      <h3>It is not a chatbot</h3>
+      <p>Every message — <em>“hi”</em>, <em>“hide sector 4”</em>, anything — masks cells on
+      the drawing, performs one real forward pass in the server process, and reports what it
+      hid and the measured r, MSE and latency. Nothing on the canvas is a replay.</p>
+    </article>
+    <article>
+      <h3>The heads are real</h3>
+      <p>Four heads route attention over the edges. The meters are their share of the
+      attention in that pass. The edge gate is a function of edge geometry, so it does not
+      change between masks — which is why the demo shows the attention instead.</p>
+    </article>
+    <article>
+      <h3>The topology adapts</h3>
+      <p>Edge messages carry an RBF of relative position, cos/sin harmonics of the edge
+      angle on the hex grid, and both endpoint radii. A learned gate closes edges the
+      drawing does not support; a three-level pyramid pools and climbs back with gated
+      residuals.</p>
+    </article>
+  </div>
+</section>
+
+<section class="video-block">
+  <div class="video-head">
+    <h2>Seven seconds of the real thing</h2>
+    <p>Three passes in the cockpit, recorded from the running page: two sectors and the
+      evaluation mask.</p>
+  </div>
+  <video src="img/cockpit.mp4" poster="img/cockpit.jpg"
+         autoplay loop muted playsinline preload="metadata"
+         aria-label="Screen recording of the Mandala-GNN cockpit running three reconstruction passes"></video>
+</section>
+
+<section id="results" class="band">
+  <h2>Results</h2>
+  <p class="sub">Held-out 45° sector of the hex-tessellation drawing. One seed unless stated.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Run</th><th>wedge r ↑</th><th>wedge MSE ↓</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>hex mesh, 400 steps (this demo)</td><td>0.904</td><td>0.00268</td></tr>
+        <tr><td>hex mesh, 2 seeds</td><td>0.896</td><td>0.00280</td></tr>
+        <tr><td>same nodes, rewired edges</td><td>0.878</td><td>0.00325</td></tr>
+        <tr><td>square grid mesh</td><td>0.960</td><td>0.00235</td></tr>
+        <tr><td>star mandala + rings (61 nodes)</td><td>0.742</td><td>0.00553</td></tr>
+        <tr><td>no edges (spatial pooling only)</td><td>0.730</td><td>0.01770</td></tr>
+        <tr><td>strict MLP, depth 1, no edges</td><td>0.000</td><td>0.02860</td></tr>
+        <tr><td>mean-patch floor</td><td>—</td><td>0.01536</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note-grid">
+    <article class="note warn">
+      <div class="tag">control</div>
+      <h3>Edge gate off → r = 0.078</h3>
+      <p>Without per-edge gating the model barely reconstructs the wedge. Confounded: the
+      ablation also removes ~0.3× attention damping. Read it as “gating matters”.</p>
+    </article>
+    <article class="note">
+      <div class="tag">control</div>
+      <h3>No edges at all → r = 0.730</h3>
+      <p>The pyramid still pools spatially, so this is not an MLP. Positional pooling gets
+      most of the way; the graph closes the last 0.17.</p>
+    </article>
+    <article class="note bad">
+      <div class="tag">floor</div>
+      <h3>Strict MLP → r = 0.00</h3>
+      <p>MSE 0.0286 against a 0.029 mean-patch baseline: it learns the average patch and
+      nothing else. The wedge needs messages, not memorised positions.</p>
+    </article>
+  </div>
+
+  <p class="caption">
+    The grid “win” is a tiling artefact: with circular patches, hex (0.989) and square grid
+    (0.990) are indistinguishable, and the no-edge control falls to 0.882 — the lattice is
+    not the source of the gain. Full tables, both patch shapes, all seeds:
+    <a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/docs/results.md">docs/results.md</a>.
+  </p>
+</section>
+
+<section id="run" class="band run">
+  <div>
+    <h2>Run the live cockpit</h2>
+    <p>
+      This is a GitHub Pages site, so there is no Python behind it: the video above is a
+      recording, and the inference runs on the machine that serves the page. The demo is
+      two commands and no build step, and it runs on a phone CPU.
+    </p>
+    <pre class="code">git clone https://github.com/BoogerCheeseOnRye/mandala-gnn
+cd mandala-gnn
+python -m venv .venv &amp;&amp; .venv/bin/pip install -r requirements.txt
+./run.sh            # opens http://localhost:8000</pre>
+    <p class="fine">
+      The page is up in ~1 s; the <b>Launch the model</b> button imports torch and loads the
+      1.7 MB checkpoint (~4.5 s cold on the phone that trained it), then runs the held-out
+      wedge. After that a pass takes ~0.25 s. A hosted space with the same demo is planned
+      on Hugging Face.
+    </p>
+  </div>
+  <div class="run-side">
+    <h3>Inside the repo</h3>
+    <ul>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/mandalanet/layers.py">layers.py</a> — radial attention with geometry bias, harmonics and edge gate</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/mandalanet/pyramid.py">pyramid.py</a> — pooling down, gated residual up</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/mandalanet/serve.py">serve.py</a> — the demo server: real forward passes, per-head attention</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/docs/design-notes.md">design notes</a> — prompt-to-code map and the decisions</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/tree/main/runs/main-hex">runs/main-hex</a> — checkpoint, metrics, reconstruction</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band limits-band">
+  <h2>What this is not</h2>
+  <p>
+    No claim of a new architecture. Message passing, RBF edge features, angular harmonics and
+    U-Net-style pooling are standard; the point is that they were chosen from the drawings and
+    then ablated. Half the story survives: symmetry-aware attention and the pyramid clearly pay.
+    The hand-drawn <em>lattice</em> does not, at this scale. One seed for the demo run; one
+    drawing per checkpoint; the chord target is low-frequency, so local ink density explains
+    much of the variance; and r on a mostly blank wedge is flattered by large empty regions.
+  </p>
+  <p class="links">
+    <a class="btn" href="paper.html">Read the paper</a>
+    <a class="btn ghost" href="https://github.com/BoogerCheeseOnRye/mandala-gnn">Source on GitHub</a>
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <span>Mandala-GNN · 2026</span>
+  <span class="mono">203 nodes · 2,092 edges · 405,342 params · 1 thread</span>
+  <span>Built from three hand drawings.</span>
+</footer>
+
+</body>
+</html>

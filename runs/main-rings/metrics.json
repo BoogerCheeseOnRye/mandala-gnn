@@ -1,0 +1,80 @@
+{
+  "config": {
+    "drawing": "drawings/star-mandala.jpg",
+    "mesh": "rings",
+    "task": "recon",
+    "dim": 64,
+    "depth": 3,
+    "blocks": 2,
+    "heads": 4,
+    "harmonics": 4,
+    "rbf_bins": 8,
+    "cell": 0.125,
+    "dropout": 0.1,
+    "edge_gate": true,
+    "mask_ratio": 0.2,
+    "n_sectors": 8,
+    "val_sector": 0,
+    "sparsity": 0.001,
+    "lr": 0.003,
+    "weight_decay": 0.005,
+    "steps": 400,
+    "seed": 0,
+    "out": "runs/main-rings",
+    "threads": 1
+  },
+  "metrics": {
+    "train_mse": 0.012569945305585861,
+    "val_mse": 0.010289931669831276,
+    "wedge_mse": 0.0055298348888754845,
+    "val_corr": 0.7795946598052979,
+    "wedge_corr": 0.7416503429412842,
+    "mean_baseline_val_mse": 0.025929134339094162,
+    "mean_baseline_wedge_mse": 0.020788133144378662,
+    "gate_mean": 0.2921135425567627,
+    "level_weights": [
+      0.333,
+      0.333,
+      0.333
+    ],
+    "depth_used": 3,
+    "params": 405342,
+    "nodes": 61,
+    "edges": 192,
+    "seconds": 101.9
+  },
+  "history": [
+    [
+      0,
+      0.5980077981948853
+    ],
+    [
+      50,
+      0.018084648996591568
+    ],
+    [
+      100,
+      0.01589362695813179
+    ],
+    [
+      150,
+      0.013514242134988308
+    ],
+    [
+      200,
+      0.010318002663552761
+    ],
+    [
+      250,
+      0.008894123136997223
+    ],
+    [
+      300,
+      0.010778718627989292
+    ],
+    [
+      350,
+      0.00828748568892479
+    ]
+  ]
+}
