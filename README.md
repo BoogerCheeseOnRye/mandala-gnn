@@ -90,6 +90,10 @@ composite` (3x). Docs: `docs/design-notes.md`, `docs/results.md`.
 ./run.sh stop
 ```
 
+The static project page in `docs/` (GitHub Pages) is generated with
+`tools/build_pages.sh`; it embeds the paper, the results and a recorded clip,
+because Pages cannot run the Python server.
+
 `run.sh` is also on PATH as `mandala-gnn` and installed as a Linux app
 (`~/.local/share/applications/mandala-gnn.desktop`), so it can be opened from
 the app drawer without a terminal.

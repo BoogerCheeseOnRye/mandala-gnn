@@ -68,13 +68,13 @@ h1, h2, h3 { font-weight: 600; line-height: 1.2; letter-spacing: -.015em; }
 main { max-width: 1080px; margin: 0 auto; padding: 0 20px 40px; }
 
 /* hero */
-.hero { padding: 56px 0 26px; }
+.hero { padding: 38px 0 20px; }
 .eyebrow {
   margin: 0 0 12px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--ink-faint);
 }
-.hero h1 { font-size: clamp(30px, 4.4vw, 50px); max-width: 20ch; margin: 0 0 16px; }
-.lede { max-width: 70ch; color: var(--ink-dim); font-size: 16.5px; margin: 0 0 26px; }
+.hero h1 { font-size: clamp(28px, 3.5vw, 42px); max-width: 26ch; margin: 0 0 12px; }
+.lede { max-width: 66ch; color: var(--ink-dim); font-size: 15.5px; margin: 0 0 20px; }
 
 .stats {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
@@ -86,7 +86,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 20px 40px; }
   padding: 9px 12px;
 }
 .stats b {
-  display: block; font-family: var(--mono); font-size: 19px; font-weight: 600;
+  display: block; font-family: var(--mono); font-size: 18px; font-weight: 600;
   color: var(--ink); letter-spacing: -.02em;
 }
 .stats div:first-child b { color: var(--mint); }
