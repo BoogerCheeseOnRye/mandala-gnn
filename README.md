@@ -1,7 +1,9 @@
 # mandala-gnn
 
 **Project page:** https://boogercheeseonrye.github.io/mandala-gnn/  
-**Paper:** https://boogercheeseonrye.github.io/mandala-gnn/paper.html
+**Paper:** https://boogercheeseonrye.github.io/mandala-gnn/paper.html  
+**Weights:** https://huggingface.co/BoogerCheeseOnRye/mandala-gnn  
+**Ablation sweep:** https://huggingface.co/datasets/BoogerCheeseOnRye/mandala-gnn-ablations
 
 ![The live cockpit](docs/img/cockpit.jpg)
 
@@ -152,7 +154,27 @@ What survives scrutiny:
   6-point win with square patches disappears with disc patches - it was patch
   tiling, not topology.
 
-Full tables, both patch shapes, all seeds: **[docs/results.md](docs/results.md)**.
+Full tables, both patch shapes, all seeds: **[docs/results.md](docs/results.md)**,
+and as raw files on Hugging Face:
+[huggingface.co/datasets/BoogerCheeseOnRye/mandala-gnn-ablations](https://huggingface.co/datasets/BoogerCheeseOnRye/mandala-gnn-ablations).
+
+## Publishing to Hugging Face
+
+The checkpoint and the sweeps are mirrored there, generated from this repo so
+nothing is hand-maintained on the Hub:
+
+```bash
+hf auth login          # once
+./tools/push_hf.sh     # model + dataset (+ Space, if the account can host one)
+./tools/push_hf.sh --stage   # assemble the folders, upload nothing
+```
+
+`tools/push_hf.sh model` and `... dataset` are the two repos that exist:
+`BoogerCheeseOnRye/mandala-gnn` (weights, metrics, `demo.json`) and
+`.../mandala-gnn-ablations` (every sweep, plus a flattened `summary.csv`).
+The third target is a Docker Space that serves this exact cockpit on port 7860;
+its files are in `tools/hf/` and are staged the same way, but Hugging Face now
+requires a PRO subscription to host Docker Spaces, so it is not published.
 
 ## What this is not
 
