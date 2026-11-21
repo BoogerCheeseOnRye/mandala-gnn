@@ -176,7 +176,7 @@ The third target is a Docker Space that serves this exact cockpit on port 7860;
 its files are in `tools/hf/` and are staged the same way, but Hugging Face now
 requires a PRO subscription to host Docker Spaces, so it is not published.
 
-## The next step that didn't work: an energy head
+## Energy head: one search loop, measured and closed
 
 The obvious follow-up is to search instead of predicting once: freeze the
 backbone, learn a scalar `E(h) = Σφ(h_i) + Σψ(h_i, h_j, e_ij)` over its node
@@ -184,7 +184,7 @@ states, and descend it on the hidden cells. It is implemented in
 `mandalanet/energy.py` (6,946 parameters) and tested end to end by
 `tools/energy_experiment.py` (~64 s, writes `runs/energy/`).
 
-The head learned the wrong thing, and the experiment shows it three ways:
+It learned the other variable, and the experiment shows it three ways:
 
 | test | result |
 |---|---|
@@ -197,8 +197,10 @@ The head learned the wrong thing, and the experiment shows it three ways:
 | per-node E vs per-node error | −0.52 on the wedge, +0.26 on val |
 
 Ranking *how much was hidden* is not ranking *how right the redraw is*; descent
-exploits the gap and destroys the drawing. Kept as a documented negative
-result, with the write-up and figures at
+exploits the gap and destroys the drawing. What that closes is test-time search
+on a frozen backbone's states -- not the direction this repo is on. The same
+signal is still useful as a selector (how much of a drawing a state had to
+invent), and topology is untouched by the result. Write-up and figures:
 **[docs/energy.html](https://boogercheeseonrye.github.io/mandala-gnn/energy.html)**.
 
 ## What this is not

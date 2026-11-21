@@ -209,22 +209,33 @@
 </section>
 
 <section class="band">
-  <h2>What would have to change</h2>
+  <h2>What this closes — and what it does not</h2>
   <p>
-    The negative result is specific, and so is the fix. A head trained to separate
-    "saw more" from "saw less" has no reason to know which of two equally-masked
-    completions is right; the objective never mentioned it. To make search work you would
-    need quality labels — pairs of completions <em>of the same mask</em>, ordered by their
-    true error — and a sampler that stays on the manifold of drawings the backbone can
-    produce, or a backbone that is fine-tuned through the energy rather than frozen
-    behind it. Both are larger experiments than this one, and both would still have to
-    beat a 0.9057 baseline that a single forward pass reaches in 0.25 s.
+    What is closed is narrow: a head trained to rank how much a state saw cannot rank how
+    right it is, and descending it cannot improve a redraw. To make that specific loop work
+    you would need quality labels — pairs of completions <em>of the same mask</em>, ordered
+    by their true error — a sampler that stays on the manifold of drawings the backbone can
+    produce, or a backbone fine-tuned through the energy instead of frozen behind it. Those
+    are different experiments, and all of them would still have to beat a 0.9057 baseline
+    that one forward pass reaches in 0.25 s.
   </p>
   <p>
-    So this stays a documented dead end rather than a feature. The useful part is the
-    diagnostic: before building a search loop on top of a learned energy, check that it
-    prefers the answer to the guess and that its per-node values track per-node error.
-    Both are cheap, and this one fails both.
+    That is a result about test-time search, and it is why it was published: it removes one
+    expensive assumption before the next layer is built on it. It is not a result about the
+    direction this project is on. That direction is already measured in the repo: three
+    drawings, eight rotations each, one graph per drawing, and a label that is recoverable
+    only from how the patches are arranged. Train on 0°/90°/180°/270° and test on the four
+    unseen angles, and the classification head scores 1.00 — the encoder is reading topology,
+    not memorising pixels (<span class="mono">runs/classify</span>). The same pooled state is
+    what an answer head would sit on; the energy experiment says nothing about it.
+  </p>
+  <p>
+    What the head does contribute is not a landscape but a scalar that reliably says how much
+    of a drawing a state had to invent. Used as a <em>selector</em> rather than a loss, that is
+    worth testing where the question is real: which region to ask for before answering, or
+    which drawing's topology to route a question through. Both are selection problems, scored
+    the way the visibility test was scored here — prefer the right candidate to the wrong one —
+    and neither has been run yet.
   </p>
 </section>
 
@@ -252,6 +263,7 @@
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/mandalanet/energy.py">energy.py</a> — head, training, h-descent, patch descent</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/tools/energy_experiment.py">energy_experiment.py</a> — the whole experiment and the figures</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/energy/results.json">results.json</a> — baseline, sweeps, per-node test</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/classify/metrics.json">runs/classify</a> — the multi-drawing task, 1.00 on unseen angles</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/docs/design-notes.md">design notes</a> — where the idea came from</li>
       <li><a href="index.html">back to the cockpit</a></li>
     </ul>
@@ -280,7 +292,7 @@
 <footer>
   <span>Mandala-GNN · 2026</span>
   <span class="mono">6,946 head params · 405,342 frozen · 1 thread · 64 s</span>
-  <span>A negative result, kept.</span>
+  <span>One branch closed · the topology line stays open</span>
 </footer>
 
 </body>
