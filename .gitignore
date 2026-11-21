@@ -4,3 +4,4 @@ __pycache__/
 runs/*.log
 runs/**/*.pt
 !runs/main-hex/model.pt
+runs/energy/*.png

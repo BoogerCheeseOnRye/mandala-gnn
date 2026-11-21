@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07080c">
+<title>Mandala-GNN — the energy head that did not work</title>
+<meta name="description" content="A 6,946-parameter energy head over a frozen 405k-parameter GNN: what it learned (how much was hidden), what it did not (whether the redraw was right), and why descent into it fails.">
+<meta property="og:title" content="Mandala-GNN — the energy head">
+<meta property="og:description" content="Freeze the backbone, learn E(h), descend it to improve a redraw. 64 seconds of experiment, one negative result, and the diagnostic that explains it.">
+<meta property="og:image" content="img/energy-quality.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="./">
+    <span class="mark" aria-hidden="true"></span>
+    <span>MANDALA<span class="dash">-</span>GNN</span>
+  </a>
+  <nav>
+    <a href="index.html#results">Results</a>
+    <a href="paper.html">Paper</a>
+    <a class="here" href="energy.html">Energy head</a>
+    <a href="https://huggingface.co/BoogerCheeseOnRye/mandala-gnn">Weights ↗</a>
+    <a class="code-link" href="https://github.com/BoogerCheeseOnRye/mandala-gnn">Code ↗</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="hero">
+  <p class="eyebrow">Follow-up experiment · November 2026</p>
+  <h1>Can an energy head turn the completion into a search?</h1>
+  <p class="lede">
+    The first write-up ended with a question: instead of one forward pass, could the
+    model <em>search</em> for a better redraw by minimising a learned scalar over its own
+    hidden states? Freeze the 405k-parameter backbone, fit a small
+    <span class="mono">E(h)</span> on top, descend it on the 25 hidden cells. The head
+    costs 6,946 parameters and 64 seconds to test. It learned something real — just not
+    the thing descent needs.
+  </p>
+
+  <div class="stats">
+    <div><b>6,946</b><span>head parameters</span></div>
+    <div><b>24/24</b><span>visibility pairs ranked</span></div>
+    <div><b>+0.08%</b><span>E(true) vs E(guess)</span></div>
+    <div><b>0.9049</b><span>wedge r after descent</span></div>
+    <div><b>64 s</b><span>whole experiment</span></div>
+  </div>
+</section>
+
+<section class="band">
+  <h2>The plan</h2>
+  <p class="sub">Option A from the notes: keep the trained GNN frozen, learn a scalar
+    energy on the states it produces, then treat completion as minimisation.</p>
+
+  <pre class="code">E(h)  =  Σ_i φ(h_i)  +  Σ_(i,j) ψ(h_i, h_j, e_ij)
+
+φ : 64 → 64 → 1          per node
+ψ : 64 + 64 + 21 → 32 → 1   per directed edge, geometry included
+6,946 parameters          (2,113 without ψ)</pre>
+
+  <p>
+    The head is trained on pairs of states from the frozen backbone: one where most of the
+    drawing was visible, one where most of it was hidden.
+    <span class="mono">loss = relu(E_seen − E_hidden + 2)</span>, 400 AdamW steps, no
+    backbone in the loop. Every training state keeps the held-out wedge hidden, so the
+    wedge test cannot leak the answer. Descent then moves only the 25 hidden nodes'
+    states, anchored to where the forward pass left them, with the step size and anchor
+    tuned on the validation mask — never on the wedge.
+  </p>
+  <p>
+    Three questions decide whether this can work at all: does
+    <span class="mono">E</span> prefer the true patches to the model's guess? does it order
+    completions by quality? does descending it improve the redraw? All three are
+    measurable, and all three are below.
+  </p>
+</section>
+
+<section class="band">
+  <h2>Every test, and what it returned</h2>
+  <p class="sub">One checkpoint, one drawing, one seed unless noted. Baseline: wedge
+    r 0.9057, MSE 0.00245 on 25 cells.</p>
+
+  <div class="table-wrap prose">
+    <table>
+      <thead><tr><th>Test</th><th>Asks</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>true patches vs the guess</td><td>does E prefer the answer?</td><td>6,183.5 vs 6,178.8 · +0.08% the wrong way</td></tr>
+        <tr><td>blend guess → truth, 5 points</td><td>does E fall as r rises?</td><td>r 0.906 → 1.000, E 6,178.8 → 6,183.5</td></tr>
+        <tr><td>24 visibility pairs</td><td>does E rank "saw more" lower?</td><td>24 / 24 correct</td></tr>
+        <tr><td>hide 26 → 105 cells</td><td>does E track how much was hidden?</td><td>11.2k → 25.3k, monotone</td></tr>
+        <tr><td>descend h, 25 steps</td><td>does wedge r improve?</td><td>0.9049 (was 0.9057), E −1.7%</td></tr>
+        <tr><td>node-only head (2,113 params)</td><td>does the edge term matter?</td><td>0.9055, same non-result</td></tr>
+        <tr><td>descend the completion, 10 steps</td><td>does a lower E mean a better redraw?</td><td>r 0.832 → 0.156 as lr rises, E falls throughout</td></tr>
+        <tr><td>best of 8 sampled states</td><td>can E pick a better candidate?</td><td>Δr −0.0007 ± 0.0009 (8 seeds)</td></tr>
+        <tr><td>per-node E vs per-node error</td><td>is it an uncertainty map?</td><td>r −0.52 on the wedge, +0.26 on val</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="caption">
+    The last two rows matter as much as the first: a scorer that picks the best of eight
+    random candidates would show a positive Δr, and a useful per-cell signal would
+    correlate with error. Neither happens. "Best of 8" was tuned on
+    <span class="mono">val_mask</span> and then repeated over eight sampling seeds, because
+    the wedge is only 25 cells and a single draw is noise.
+  </p>
+</section>
+
+<section class="band">
+  <h2>The decisive picture</h2>
+  <p class="sub">Same mask, same support, five completions of increasing quality. Only the
+    patches change.</p>
+
+  <figure class="shot">
+    <img src="img/energy-quality.png" alt="Energy plotted against wedge correlation for five completions blended from the model's guess to the true patches: the line rises slightly from r 0.906 to r 1.000, ending higher at the truth.">
+    <figcaption>
+      A usable landscape is a falling line: better redraw, lower energy. This one rises.
+      The whole vertical range is 0.08% of E, so the head is close to indifferent — but
+      what little signal it has points the wrong way, and a descent procedure will
+      happily follow it downhill.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="band">
+  <h2>Descending h: safe, because it barely moves</h2>
+
+  <figure class="shot">
+    <img src="img/energy-curve.png" alt="Two panels against descent step: energy falls steadily from 10,930 to 10,748; wedge r falls from 0.9057 to 0.9049.">
+    <figcaption>
+      25 steps on the 25 hidden states, lr 0.01, anchor 0.1 tuned on
+      <span class="mono">val_mask</span>. The energy drops 1.7%; the redraw loses 0.0008 r.
+      The node-only head lands in the same place (0.9055), at 18 ms per step instead of 30.
+      Nothing here is broken — it is just inert, because the frozen backbone maps a large
+      region of state space to almost the same picture.
+    </figcaption>
+  </figure>
+
+  <figure class="shot">
+    <img src="img/energy-recon.png" alt="Three panels: the drawing with the wedge masked, the baseline completion, and the completion after h-descent; the last two look identical.">
+    <figcaption>
+      Left to right: the drawing with the wedge hidden, the ordinary forward pass, and
+      h-descent. The wedge is the soft patch; it is unchanged, which is what Δr = −0.0008
+      looks like.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="band">
+  <h2>Descending the completion: the exploit</h2>
+  <p class="sub">The other formulation writes the guessed patches into the drawing, marks
+    them visible, and moves them downhill through the frozen backbone. This one can
+    change the picture.</p>
+
+  <figure class="shot">
+    <img src="img/energy-collapse.png" alt="Three panels: baseline completion; 10 steps at lr 0.01 where the wedge is grainy; 10 steps at lr 0.15 where the wedge is black-and-white noise.">
+    <figcaption>
+      Ten steps, three step sizes. E falls at every step — 9,933 → 9,840 at lr 0.005,
+      9,933 → 9,178 at lr 0.15 — while wedge r goes 0.906 → 0.832 → 0.156 and MSE goes
+      0.0024 → 0.0046 → 0.96. The head was trained to rank states, not to be optimised;
+      descent walks straight into whatever corner it has, and the corner is a drawing
+      no hand would make.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="band">
+  <h2>What the head actually learned</h2>
+  <p class="sub">Not quality. Visibility: how much of the drawing the state had to guess.</p>
+
+  <figure class="shot">
+    <img src="img/energy-mask.png" alt="Two panels against cells hidden, 26 to 105: energy rises monotonically from 11.2 to 25.3 thousand; r stays between 0.906 and 0.976.">
+    <figcaption>
+      Energy rises monotonically with the number of hidden cells, which is exactly what the
+      paired loss asked for. Correlation on the hidden cells stays in a 0.91–0.98 band over
+      the same five masks, so the rise is about <em>how much</em> was hidden, not
+      <em>how well</em> it was redrawn. The 24/24 pairwise result is the same finding,
+      sharper: give it two states of one drawing and it always ranks the one that saw more.
+    </figcaption>
+  </figure>
+
+  <div class="note-grid">
+    <article class="note">
+      <div class="tag">real</div>
+      <h3>A visibility scorer</h3>
+      <p>It can say how much of a drawing a state had to invent — useful for ranking masks
+      by expected difficulty, or flagging a pass that guessed most of its cells. That part
+      is measured, not asserted: 24/24 pairs and a monotone mask sweep.</p>
+    </article>
+    <article class="note bad">
+      <div class="tag">missing</div>
+      <h3>No quality axis</h3>
+      <p>The truth scores worse than the guess; the blend is flat then rising; per-node
+      energy anti-correlates with error on the wedge (−0.52) and barely correlates on val
+      (+0.26). There is no direction in which "better redraw" is downhill.</p>
+    </article>
+    <article class="note warn">
+      <div class="tag">consequence</div>
+      <h3>Descent finds the exploit</h3>
+      <p>h-descent is harmless only because the frozen backbone cannot move the picture
+      much. Let the patches move and the same gradient destroys the drawing while the
+      score improves. A landscape that is not a quality landscape cannot be optimised
+      for quality.</p>
+    </article>
+  </div>
+</section>
+
+<section class="band">
+  <h2>What would have to change</h2>
+  <p>
+    The negative result is specific, and so is the fix. A head trained to separate
+    "saw more" from "saw less" has no reason to know which of two equally-masked
+    completions is right; the objective never mentioned it. To make search work you would
+    need quality labels — pairs of completions <em>of the same mask</em>, ordered by their
+    true error — and a sampler that stays on the manifold of drawings the backbone can
+    produce, or a backbone that is fine-tuned through the energy rather than frozen
+    behind it. Both are larger experiments than this one, and both would still have to
+    beat a 0.9057 baseline that a single forward pass reaches in 0.25 s.
+  </p>
+  <p>
+    So this stays a documented dead end rather than a feature. The useful part is the
+    diagnostic: before building a search loop on top of a learned energy, check that it
+    prefers the answer to the guess and that its per-node values track per-node error.
+    Both are cheap, and this one fails both.
+  </p>
+</section>
+
+<section id="run" class="band run">
+  <div>
+    <h2>Reproduce it</h2>
+    <p>
+      Nothing here is retrained: the checkpoint in <span class="mono">runs/main-hex</span>
+      is the one the demo serves. The experiment trains only the head, then writes the
+      numbers and the five figures on this page.
+    </p>
+    <pre class="code">.venv/bin/python tools/energy_experiment.py \
+    --ckpt runs/main-hex --out runs/energy</pre>
+    <p class="fine">
+      ~64 s on one thread of the phone CPU. Outputs: <span class="mono">results.json</span>
+      (every number quoted above), <span class="mono">head.pt</span> (both heads and the
+      tuned step), and the figures. The code is
+      <span class="mono">mandalanet/energy.py</span> — head, state bank, training, and both
+      descent loops — plus the one script that runs them.
+    </p>
+  </div>
+  <div class="run-side">
+    <h3>Files</h3>
+    <ul>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/mandalanet/energy.py">energy.py</a> — head, training, h-descent, patch descent</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/tools/energy_experiment.py">energy_experiment.py</a> — the whole experiment and the figures</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/energy/results.json">results.json</a> — baseline, sweeps, per-node test</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/docs/design-notes.md">design notes</a> — where the idea came from</li>
+      <li><a href="index.html">back to the cockpit</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="band limits-band">
+  <h2>Scope</h2>
+  <p>
+    One drawing, one checkpoint, one seed for the training bank; the wedge is 25 cells, so
+    differences below ~0.001 r are noise — which is why the sampling result carries a
+    standard deviation over eight seeds and the descent result is reported as a
+    non-improvement rather than a loss. The head sees only states the frozen backbone
+    produces, so this tests "energy over a frozen model's states", not energy-based
+    training in general.
+  </p>
+  <p class="links">
+    <a class="btn" href="index.html">The original demo</a>
+    <a class="btn ghost" href="https://github.com/BoogerCheeseOnRye/mandala-gnn">Source on GitHub</a>
+    <a class="btn ghost" href="https://huggingface.co/BoogerCheeseOnRye/mandala-gnn">Weights on Hugging Face</a>
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <span>Mandala-GNN · 2026</span>
+  <span class="mono">6,946 head params · 405,342 frozen · 1 thread · 64 s</span>
+  <span>A negative result, kept.</span>
+</footer>
+
+</body>
+</html>

@@ -176,6 +176,31 @@ The third target is a Docker Space that serves this exact cockpit on port 7860;
 its files are in `tools/hf/` and are staged the same way, but Hugging Face now
 requires a PRO subscription to host Docker Spaces, so it is not published.
 
+## The next step that didn't work: an energy head
+
+The obvious follow-up is to search instead of predicting once: freeze the
+backbone, learn a scalar `E(h) = Σφ(h_i) + Σψ(h_i, h_j, e_ij)` over its node
+states, and descend it on the hidden cells. It is implemented in
+`mandalanet/energy.py` (6,946 parameters) and tested end to end by
+`tools/energy_experiment.py` (~64 s, writes `runs/energy/`).
+
+The head learned the wrong thing, and the experiment shows it three ways:
+
+| test | result |
+|---|---|
+| E(true patches) vs E(model's guess) | 6,183.5 vs 6,178.8 — the guess scores *better* |
+| blend guess → truth, r 0.906 → 1.000 | E rises (6,178.8 → 6,183.5) |
+| 24 pairs, one saw more than the other | 24/24 ranked correctly — it is a visibility scorer |
+| descend h, 25 steps | wedge r 0.9049 vs 0.9057 baseline |
+| descend the completion, 10 steps | r 0.832 → 0.156 while E falls throughout |
+| best of 8 sampled states | Δr −0.0007 ± 0.0009 over 8 seeds |
+| per-node E vs per-node error | −0.52 on the wedge, +0.26 on val |
+
+Ranking *how much was hidden* is not ranking *how right the redraw is*; descent
+exploits the gap and destroys the drawing. Kept as a documented negative
+result, with the write-up and figures at
+**[docs/energy.html](https://boogercheeseonrye.github.io/mandala-gnn/energy.html)**.
+
 ## What this is not
 
 No claim of a new architecture. The pieces -- message passing, RBF edge
