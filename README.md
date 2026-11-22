@@ -182,25 +182,30 @@ The obvious follow-up is to search instead of predicting once: freeze the
 backbone, learn a scalar `E(h) = Σφ(h_i) + Σψ(h_i, h_j, e_ij)` over its node
 states, and descend it on the hidden cells. It is implemented in
 `mandalanet/energy.py` (6,946 parameters) and tested end to end by
-`tools/energy_experiment.py` (~64 s, writes `runs/energy/`).
+`tools/energy_experiment.py` on all three drawings, merged by
+`tools/energy_compare.py`.
 
-It learned the other variable, and the experiment shows it three ways:
+| test | hex (203 nodes) | mandala (61) | chart (25) |
+|---|---|---|---|
+| baseline wedge r | 0.9057 | 0.7663 | 0.9357 |
+| E(true) − E(model's guess) | +0.08% | +0.36% | −0.03% |
+| descend h, 25 steps | 0.9049 | 0.7622 | 0.9354 |
+| best of 8 sampled states, Δr | −0.0007 ± 0.0009 | −0.0003 ± 0.0036 | +0.0002 ± 0.0005 |
+| descend the completion, 10 steps | 0.832 → 0.156 | 0.697 → 0.015 | 0.789 → 0.132 |
+| visibility ranking, 24 pairs | 24/24 | 19/24 | 14/24 |
+| per-node E vs per-node error | −0.52 | −0.66 | +0.75 |
 
-| test | result |
-|---|---|
-| E(true patches) vs E(model's guess) | 6,183.5 vs 6,178.8 — the guess scores *better* |
-| blend guess → truth, r 0.906 → 1.000 | E rises (6,178.8 → 6,183.5) |
-| 24 pairs, one saw more than the other | 24/24 ranked correctly — it is a visibility scorer |
-| descend h, 25 steps | wedge r 0.9049 vs 0.9057 baseline |
-| descend the completion, 10 steps | r 0.832 → 0.156 while E falls throughout |
-| best of 8 sampled states | Δr −0.0007 ± 0.0009 over 8 seeds |
-| per-node E vs per-node error | −0.52 on the wedge, +0.26 on val |
+Two things hold on all three drawings: the energy is flat along the quality
+axis (within 0.4% from the guess to the true patches, sign inconsistent), and
+descending it never improves the redraw -- while letting the patches themselves
+move destroys the drawing as the score improves. The visibility ranking does
+*not* replicate (24/24, 19/24, 14/24 against 12/24 for chance), so "visibility
+scorer" is a fact about the 203-node graph, not about the method.
 
-Ranking *how much was hidden* is not ranking *how right the redraw is*; descent
-exploits the gap and destroys the drawing. What that closes is test-time search
-on a frozen backbone's states -- not the direction this repo is on. The same
-signal is still useful as a selector (how much of a drawing a state had to
-invent), and topology is untouched by the result. Write-up and figures:
+What that closes is test-time search on a frozen backbone's states -- not the
+direction this repo is on. Topology is untouched by the result, and the same
+signal is still testable as a *selector* (how much of a drawing a state had to
+invent), scored on more than one drawing this time. Write-up and figures:
 **[docs/energy.html](https://boogercheeseonrye.github.io/mandala-gnn/energy.html)**.
 
 ## What this is not

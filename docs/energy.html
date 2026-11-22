@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#07080c">
-<title>Mandala-GNN — the energy head that did not work</title>
-<meta name="description" content="A 6,946-parameter energy head over a frozen 405k-parameter GNN: what it learned (how much was hidden), what it did not (whether the redraw was right), and why descent into it fails.">
+<title>Mandala-GNN — the energy head, on three drawings</title>
+<meta name="description" content="A 6,946-parameter energy head over a frozen GNN, tested on all three hand drawings (203, 61 and 25 nodes): descent does not improve the redraw on any of them.">
 <meta property="og:title" content="Mandala-GNN — the energy head">
-<meta property="og:description" content="Freeze the backbone, learn E(h), descend it to improve a redraw. 64 seconds of experiment, one negative result, and the diagnostic that explains it.">
-<meta property="og:image" content="img/energy-quality.png">
+<meta property="og:description" content="Freeze the backbone, learn E(h), descend it to improve a redraw. Three drawings, 64 s each, and the same answer on all three.">
+<meta property="og:image" content="img/energy-replication.png">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
@@ -36,17 +36,17 @@
     The first write-up ended with a question: instead of one forward pass, could the
     model <em>search</em> for a better redraw by minimising a learned scalar over its own
     hidden states? Freeze the 405k-parameter backbone, fit a small
-    <span class="mono">E(h)</span> on top, descend it on the 25 hidden cells. The head
-    costs 6,946 parameters and 64 seconds to test. It learned something real — just not
-    the thing descent needs.
+    <span class="mono">E(h)</span> on top, descend it on the hidden cells. The head costs
+    6,946 parameters and a minute per drawing. Run on all three drawings in the repo —
+    203, 61 and 25 nodes — descent improves the redraw on none of them.
   </p>
 
   <div class="stats">
     <div><b>6,946</b><span>head parameters</span></div>
-    <div><b>24/24</b><span>visibility pairs ranked</span></div>
-    <div><b>+0.08%</b><span>E(true) vs E(guess)</span></div>
-    <div><b>0.9049</b><span>wedge r after descent</span></div>
-    <div><b>64 s</b><span>whole experiment</span></div>
+    <div><b>3</b><span>drawings tested</span></div>
+    <div><b>0 / 3</b><span>descent gains</span></div>
+    <div><b>±0.4%</b><span>E(true) vs E(guess)</span></div>
+    <div><b>64 s</b><span>per drawing</span></div>
   </div>
 </section>
 
@@ -66,9 +66,10 @@
     drawing was visible, one where most of it was hidden.
     <span class="mono">loss = relu(E_seen − E_hidden + 2)</span>, 400 AdamW steps, no
     backbone in the loop. Every training state keeps the held-out wedge hidden, so the
-    wedge test cannot leak the answer. Descent then moves only the 25 hidden nodes'
-    states, anchored to where the forward pass left them, with the step size and anchor
-    tuned on the validation mask — never on the wedge.
+    wedge test cannot leak the answer. Descent then moves only the hidden states (25
+    nodes on the hex drawing, 8 on the mandala, 3 on the chart), anchored to where the
+    forward pass left them, with the step size and anchor tuned on the validation mask —
+    never on the wedge.
   </p>
   <p>
     Three questions decide whether this can work at all: does
@@ -79,50 +80,61 @@
 </section>
 
 <section class="band">
-  <h2>Every test, and what it returned</h2>
-  <p class="sub">One checkpoint, one drawing, one seed unless noted. Baseline: wedge
-    r 0.9057, MSE 0.00245 on 25 cells.</p>
+  <h2>Every test, on every drawing</h2>
+  <p class="sub">Same protocol on each checkpoint. Cells: hidden cells in the wedge.
+    Baseline: no refinement, one forward pass.</p>
 
   <div class="table-wrap prose">
     <table>
-      <thead><tr><th>Test</th><th>Asks</th><th>Result</th></tr></thead>
+      <thead><tr><th>Test</th><th>Hex · 203 nodes · 25 cells</th><th>Mandala · 61 · 8</th><th>Chart · 25 · 3</th></tr></thead>
       <tbody>
-        <tr class="hl"><td>true patches vs the guess</td><td>does E prefer the answer?</td><td>6,183.5 vs 6,178.8 · +0.08% the wrong way</td></tr>
-        <tr><td>blend guess → truth, 5 points</td><td>does E fall as r rises?</td><td>r 0.906 → 1.000, E 6,178.8 → 6,183.5</td></tr>
-        <tr><td>24 visibility pairs</td><td>does E rank "saw more" lower?</td><td>24 / 24 correct</td></tr>
-        <tr><td>hide 26 → 105 cells</td><td>does E track how much was hidden?</td><td>11.2k → 25.3k, monotone</td></tr>
-        <tr><td>descend h, 25 steps</td><td>does wedge r improve?</td><td>0.9049 (was 0.9057), E −1.7%</td></tr>
-        <tr><td>node-only head (2,113 params)</td><td>does the edge term matter?</td><td>0.9055, same non-result</td></tr>
-        <tr><td>descend the completion, 10 steps</td><td>does a lower E mean a better redraw?</td><td>r 0.832 → 0.156 as lr rises, E falls throughout</td></tr>
-        <tr><td>best of 8 sampled states</td><td>can E pick a better candidate?</td><td>Δr −0.0007 ± 0.0009 (8 seeds)</td></tr>
-        <tr><td>per-node E vs per-node error</td><td>is it an uncertainty map?</td><td>r −0.52 on the wedge, +0.26 on val</td></tr>
+        <tr><td>baseline wedge r</td><td>0.9057</td><td>0.7663</td><td>0.9357</td></tr>
+        <tr><td>E(true) − E(guess)</td><td>+0.08%</td><td>+0.36%</td><td>−0.03%</td></tr>
+        <tr class="hl"><td>descend h, 25 steps</td><td>0.9049</td><td>0.7622</td><td>0.9354</td></tr>
+        <tr><td>best of 8, Δr</td><td>−0.0007 ± 0.0009</td><td>−0.0003 ± 0.0036</td><td>+0.0002 ± 0.0005</td></tr>
+        <tr><td>descend completion, r at lr 0.005 → 0.15</td><td>0.832 → 0.156</td><td>0.697 → 0.015</td><td>0.789 → 0.132</td></tr>
+        <tr><td>visibility ranking, 24 pairs</td><td>24 / 24</td><td>19 / 24</td><td>14 / 24</td></tr>
+        <tr><td>per-node E vs error, hidden / val</td><td>−0.52 / +0.26</td><td>−0.66 / +0.22</td><td>+0.75 / +0.99</td></tr>
       </tbody>
     </table>
   </div>
 
   <p class="caption">
-    The last two rows matter as much as the first: a scorer that picks the best of eight
-    random candidates would show a positive Δr, and a useful per-cell signal would
-    correlate with error. Neither happens. "Best of 8" was tuned on
-    <span class="mono">val_mask</span> and then repeated over eight sampling seeds, because
-    the wedge is only 25 cells and a single draw is noise.
+    The descent rows are the point: on the 203-node drawing, the 61-node mandala and the
+    25-node chart, moving the state downhill never buys a better redraw, best-of-eight never
+    beats the baseline outside its error bar, and letting the patches themselves move
+    destroys the drawing while the score improves. The last two rows are the ones that do
+    <em>not</em> generalise — see below.
   </p>
 </section>
 
 <section class="band">
-  <h2>The decisive picture</h2>
-  <p class="sub">Same mask, same support, five completions of increasing quality. Only the
-    patches change.</p>
+  <h2>Does it replicate?</h2>
+  <p class="sub">The same scripts, the same masks, three different drawings and graphs. This
+    is why all three were worth running.</p>
 
   <figure class="shot">
-    <img src="img/energy-quality.png" alt="Energy plotted against wedge correlation for five completions blended from the model's guess to the true patches: the line rises slightly from r 0.906 to r 1.000, ending higher at the truth.">
+    <img src="img/energy-replication.png" alt="Left: three curves of relative energy against completion r, all nearly flat, with two rising slightly and one falling. Right: bars of visibility ranking accuracy, 1.00 for hex, 0.79 for the mandala and 0.58 for the chart, with a chance line at 0.5.">
     <figcaption>
-      A usable landscape is a falling line: better redraw, lower energy. This one rises.
-      The whole vertical range is 0.08% of E, so the head is close to indifferent — but
-      what little signal it has points the wrong way, and a descent procedure will
-      happily follow it downhill.
+      Left: as the completion improves from the guess (r 0.77–0.94) to the true patches
+      (r 1.00), each drawing's energy stays within 0.4% of where it started, and the sign
+      differs between drawings. There is no quality axis to descend on any of them.
+      Right: the visibility ranking does not replicate — 24/24 on hex, 19/24 on the
+      mandala, 14/24 on the chart against 12/24 for chance. So the "visibility scorer" label
+      belongs to the big graph, not to the method.
     </figcaption>
   </figure>
+
+  <p>
+    Two claims survive all three drawings, because they are what the descent experiments
+    measure: the energy is flat along the quality axis, and descending it does not improve
+    the redraw. Three do not survive: the pairwise visibility ranking, the per-node
+    correlation and the direction of the tiny truth–guess gap. On the chart, the wedge is
+    three cells and the validation mask four, so its per-node correlations are anecdote,
+    not measurement; on the mandala the wedge is eight cells. The honest reading is that
+    this head is a weak, drawing-dependent signal — enough to be exploited by descent,
+    not enough to steer it.
+  </p>
 </section>
 
 <section class="band">
@@ -131,11 +143,12 @@
   <figure class="shot">
     <img src="img/energy-curve.png" alt="Two panels against descent step: energy falls steadily from 10,930 to 10,748; wedge r falls from 0.9057 to 0.9049.">
     <figcaption>
-      25 steps on the 25 hidden states, lr 0.01, anchor 0.1 tuned on
+      25 steps on the hex drawing's hidden states, lr 0.01, anchor 0.1 tuned on
       <span class="mono">val_mask</span>. The energy drops 1.7%; the redraw loses 0.0008 r.
       The node-only head lands in the same place (0.9055), at 18 ms per step instead of 30.
-      Nothing here is broken — it is just inert, because the frozen backbone maps a large
-      region of state space to almost the same picture.
+      The same run on the mandala costs 0.0041 r and on the chart 0.0004; nothing is broken,
+      it is inert, because the frozen backbone maps a large region of state space to almost
+      the same picture.
     </figcaption>
   </figure>
 
@@ -158,44 +171,52 @@
   <figure class="shot">
     <img src="img/energy-collapse.png" alt="Three panels: baseline completion; 10 steps at lr 0.01 where the wedge is grainy; 10 steps at lr 0.15 where the wedge is black-and-white noise.">
     <figcaption>
-      Ten steps, three step sizes. E falls at every step — 9,933 → 9,840 at lr 0.005,
-      9,933 → 9,178 at lr 0.15 — while wedge r goes 0.906 → 0.832 → 0.156 and MSE goes
-      0.0024 → 0.0046 → 0.96. The head was trained to rank states, not to be optimised;
-      descent walks straight into whatever corner it has, and the corner is a drawing
-      no hand would make.
+      Ten steps, three step sizes, on the hex drawing. E falls at every step — 9,933 →
+      9,840 at lr 0.005, 9,933 → 9,178 at lr 0.15 — while wedge r goes 0.906 → 0.832 → 0.156
+      and MSE goes 0.0024 → 0.0046 → 0.96. It is the same on the other two: r collapses to
+      0.015 on the mandala and 0.132 on the chart while E falls. The head was trained to rank
+      states, not to be optimised; descent walks straight into whatever corner it has, and
+      the corner is a drawing no hand would make.
     </figcaption>
   </figure>
 </section>
 
 <section class="band">
-  <h2>What the head actually learned</h2>
-  <p class="sub">Not quality. Visibility: how much of the drawing the state had to guess.</p>
+  <h2>What the head learned, and where that holds</h2>
+  <p class="sub">On the 203-node drawing it measures visibility. On the two smaller graphs
+    it does not even do that reliably.</p>
 
   <figure class="shot">
     <img src="img/energy-mask.png" alt="Two panels against cells hidden, 26 to 105: energy rises monotonically from 11.2 to 25.3 thousand; r stays between 0.906 and 0.976.">
     <figcaption>
-      Energy rises monotonically with the number of hidden cells, which is exactly what the
-      paired loss asked for. Correlation on the hidden cells stays in a 0.91–0.98 band over
-      the same five masks, so the rise is about <em>how much</em> was hidden, not
-      <em>how well</em> it was redrawn. The 24/24 pairwise result is the same finding,
-      sharper: give it two states of one drawing and it always ranks the one that saw more.
+      On the hex drawing, energy rises monotonically with the number of hidden cells —
+      exactly what the paired loss asked for — while correlation on the hidden cells stays in
+      a 0.91–0.98 band over the same five masks. The pairwise test agrees (24/24): given two
+      states of this drawing, it ranks the one that saw more.
+      <br><br>
+      On the other two it does not hold: 19/24 on the mandala and 14/24 on the chart, against
+      12/24 for chance. The head is fitted to a fixed bank of 20 states, so this is a fact
+      about <em>this training</em>, not about energy heads in general — and it is exactly the
+      kind of claim that one drawing would have made look universal.
     </figcaption>
   </figure>
 
   <div class="note-grid">
     <article class="note">
-      <div class="tag">real</div>
+      <div class="tag">real, on one drawing</div>
       <h3>A visibility scorer</h3>
-      <p>It can say how much of a drawing a state had to invent — useful for ranking masks
-      by expected difficulty, or flagging a pass that guessed most of its cells. That part
-      is measured, not asserted: 24/24 pairs and a monotone mask sweep.</p>
+      <p>On the hex graph it says how much of a drawing a state had to invent: 24/24 pairs and
+      a monotone mask sweep. On the mandala it drops to 19/24 and on the chart to 14/24, so
+      the signal is real but not a property of the method.</p>
     </article>
     <article class="note bad">
       <div class="tag">missing</div>
       <h3>No quality axis</h3>
-      <p>The truth scores worse than the guess; the blend is flat then rising; per-node
-      energy anti-correlates with error on the wedge (−0.52) and barely correlates on val
-      (+0.26). There is no direction in which "better redraw" is downhill.</p>
+      <p>On hex the truth scores 0.08% worse than the guess and the blend rises; on the
+      mandala 0.36% worse. Only the chart goes the right way, by 0.03%. Per-node energy
+      anti-correlates with error on hex (−0.52) and the mandala (−0.66), not on the chart
+      (+0.75, on three cells). There is no shared direction in which "better redraw" is
+      downhill.</p>
     </article>
     <article class="note warn">
       <div class="tag">consequence</div>
@@ -211,13 +232,13 @@
 <section class="band">
   <h2>What this closes — and what it does not</h2>
   <p>
-    What is closed is narrow: a head trained to rank how much a state saw cannot rank how
-    right it is, and descending it cannot improve a redraw. To make that specific loop work
-    you would need quality labels — pairs of completions <em>of the same mask</em>, ordered
-    by their true error — a sampler that stays on the manifold of drawings the backbone can
-    produce, or a backbone fine-tuned through the energy instead of frozen behind it. Those
-    are different experiments, and all of them would still have to beat a 0.9057 baseline
-    that one forward pass reaches in 0.25 s.
+    What is closed is narrow, and now measured three times: on a 203-node drawing, a 61-node
+    mandala and a 25-node chart, descending this energy never improves the redraw. To make
+    that specific loop work you would need quality labels — pairs of completions <em>of the
+    same mask</em>, ordered by their true error — a sampler that stays on the manifold of
+    drawings the backbone can produce, or a backbone fine-tuned through the energy instead of
+    frozen behind it. Those are different experiments, and all of them would still have to
+    beat a baseline that one forward pass reaches in 0.25 s.
   </p>
   <p>
     That is a result about test-time search, and it is why it was published: it removes one
@@ -230,12 +251,12 @@
     what an answer head would sit on; the energy experiment says nothing about it.
   </p>
   <p>
-    What the head does contribute is not a landscape but a scalar that reliably says how much
-    of a drawing a state had to invent. Used as a <em>selector</em> rather than a loss, that is
-    worth testing where the question is real: which region to ask for before answering, or
-    which drawing's topology to route a question through. Both are selection problems, scored
-    the way the visibility test was scored here — prefer the right candidate to the wrong one —
-    and neither has been run yet.
+    What the head contributes is not a landscape. On the big graph it is a visibility signal;
+    on the small ones it is weak. Used as a <em>selector</em> rather than a loss, that is worth
+    testing where the question is real — which region to ask for before answering, which
+    drawing's topology to route a question through — but the three-drawing run already says
+    not to expect much from it on small graphs, and to score any such selector on more than
+    one drawing before trusting it.
   </p>
 </section>
 
@@ -243,18 +264,21 @@
   <div>
     <h2>Reproduce it</h2>
     <p>
-      Nothing here is retrained: the checkpoint in <span class="mono">runs/main-hex</span>
-      is the one the demo serves. The experiment trains only the head, then writes the
-      numbers and the five figures on this page.
+      The backbones are the three checkpoints in <span class="mono">runs/</span> — the hex
+      drawing the demo serves, plus the mandala and the hub chart. Only the head is trained;
+      the compare step merges the three runs.
     </p>
-    <pre class="code">.venv/bin/python tools/energy_experiment.py \
-    --ckpt runs/main-hex --out runs/energy</pre>
+    <pre class="code">for ck in main-hex main-rings main-chart; do
+  .venv/bin/python tools/energy_experiment.py \
+      --ckpt runs/$ck --out runs/energy-${ck#main-}
+done
+.venv/bin/python tools/energy_compare.py</pre>
     <p class="fine">
-      ~64 s on one thread of the phone CPU. Outputs: <span class="mono">results.json</span>
-      (every number quoted above), <span class="mono">head.pt</span> (both heads and the
-      tuned step), and the figures. The code is
-      <span class="mono">mandalanet/energy.py</span> — head, state bank, training, and both
-      descent loops — plus the one script that runs them.
+      ~40–70 s per drawing on one thread of the phone CPU, then a second for the comparison.
+      Outputs: one <span class="mono">results.json</span> per drawing (every number quoted
+      above), <span class="mono">summary.json</span>, the heads and the figures. The code is
+      <span class="mono">mandalanet/energy.py</span> — head, state bank, training, both
+      descent loops — and two scripts that run and compare them.
     </p>
   </div>
   <div class="run-side">
@@ -262,6 +286,8 @@
     <ul>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/mandalanet/energy.py">energy.py</a> — head, training, h-descent, patch descent</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/tools/energy_experiment.py">energy_experiment.py</a> — the whole experiment and the figures</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/tools/energy_compare.py">energy_compare.py</a> — the three-drawing table and figure</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/energy/summary.json">summary.json</a> — one row per drawing</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/energy/results.json">results.json</a> — baseline, sweeps, per-node test</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/classify/metrics.json">runs/classify</a> — the multi-drawing task, 1.00 on unseen angles</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/docs/design-notes.md">design notes</a> — where the idea came from</li>
@@ -273,12 +299,13 @@
 <section class="band limits-band">
   <h2>Scope</h2>
   <p>
-    One drawing, one checkpoint, one seed for the training bank; the wedge is 25 cells, so
-    differences below ~0.001 r are noise — which is why the sampling result carries a
-    standard deviation over eight seeds and the descent result is reported as a
-    non-improvement rather than a loss. The head sees only states the frozen backbone
-    produces, so this tests "energy over a frozen model's states", not energy-based
-    training in general.
+    Three drawings, three checkpoints, one seed each for the head's training bank. The
+    graphs differ in size — 203, 61 and 25 nodes — so the wedges are 25, 8 and 3 cells and
+    the validation masks 36, 11 and 4. Differences below ~0.001 r are noise on the hex
+    drawing and larger on the others; that is why every sampling result carries a standard
+    deviation over eight seeds and why the chart's per-node correlations are printed but not
+    leaned on. The head sees only states the frozen backbone produces, so this tests "energy
+    over a frozen model's states", not energy-based training in general.
   </p>
   <p class="links">
     <a class="btn" href="index.html">The original demo</a>
@@ -291,7 +318,7 @@
 
 <footer>
   <span>Mandala-GNN · 2026</span>
-  <span class="mono">6,946 head params · 405,342 frozen · 1 thread · 64 s</span>
+  <span class="mono">3 drawings · 203 / 61 / 25 nodes · descent helps on none</span>
   <span>One branch closed · the topology line stays open</span>
 </footer>
 
