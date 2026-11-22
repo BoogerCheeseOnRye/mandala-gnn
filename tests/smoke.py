@@ -11,6 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from mandalanet.data import recon_example
 from mandalanet.lattices import build_mesh
 from mandalanet.model import MandalaNet
+from mandalanet.seq import SeqLM
+from mandalanet.synth import LAYOUTS, sample
 
 DRAWING = "drawings/star-mandala.jpg"
 
@@ -55,6 +57,17 @@ def main() -> None:
 
     tiny = MandalaNet(in_dim=ex.patch_dim + 1, out_dim=ex.patch_dim, dim=16, depth=1, blocks=1)
     check(tiny(ex.graph)["node_pred"].shape == ex.target.shape, "depth=1 works")
+
+    for pos in ("none", "abs1d", "abs2d", "geom", "geom_rbf"):
+        m = SeqLM(vocab=32, dim=32, depth=1, heads=4, pos=pos, dropout=0.0)
+        tok = torch.randint(0, 32, (2, 12))
+        logits = m(tok[:, :-1], torch.rand(2, 12, 2) * 2 - 1)
+        check(logits.shape == (2, 11, 32), f"seq pos={pos}: logits shape")
+    for layout in LAYOUTS:
+        p, c, img = sample(layout, torch.Generator().manual_seed(0))
+        check(p.shape[1] == 16 and c.shape == (p.shape[0], 2),
+              f"synth {layout}: {p.shape[0]} nodes, 4x4 patches")
+        check(float(img.min()) >= 0 and float(img.max()) <= 1, f"synth {layout}: image range")
 
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,

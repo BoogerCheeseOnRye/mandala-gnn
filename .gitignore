@@ -8,3 +8,4 @@ runs/**/*.pt
 !runs/main-chart/model.pt
 runs/energy/*.png
 runs/energy-*/*.png
+runs/seq/*.png

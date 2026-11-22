@@ -66,49 +66,85 @@ Two consequences worth stating before the ladder:
 
 ## The ladder
 
-Each rung is a question with a number attached. R0 and R1 run here; R2 is the
-real test of the thesis and takes days; R3 needs a GPU; R4 needs R3.
+Each rung is a question with a number attached. R0 is done (negative, and the
+reason is structural); R1 is narrowed to code structure; R2 is the real test of
+the thesis and takes days; R3 needs a GPU; R4 needs R3.
 
 ### R0 — does the bias work where the geometry is real? (hours)
 
 **Question:** on next-patch prediction over the drawings themselves, does a
-radial geometry bias beat a matched RoPE/absolute-position transformer?
+radial geometry bias beat a matched absolute-position transformer, and does it
+survive rotations the absolute model has never seen?
 
 **Why first:** if the bias does not help when the data *is* the geometry,
 transplanting it to text is a waste of a week. This is the control the energy
 work taught us to run.
 
-**Method:** causal transformer (`mandalanet/seq.py`) over raster-ordered 8×8
-patches (256 tokens), dim 96, 3 layers, matched parameters. Patches are
-quantised with a 64-entry codebook fit once on the training set, so the metric
-is bits/code. Three arms: RoPE baseline, radial bias from the true layout,
-radial bias from a shuffled layout. Train on synthetic drawings rendered from
-jittered/rotated/stroke-varied versions of all three layouts
-(`tools/synth_drawings.py`), test on held-out renders of the same layouts, so
-the prior is tested rather than memorisation.
+**Method:** synthetic renders of the three lattices (`mandalanet/synth.py`):
+600 train and 75 held-out drawings per layout, each with fresh node jitter,
+rotation, scale, stroke width and ink, so held-out samples are new drawings
+rather than new crops of three photographs. A 128-entry patch codebook gives
+the sequence, visited in scanline order; the model (`mandalanet/seq.py`) is a
+causal transformer, dim 80, 3 layers, 4 heads, matched across arms. Six arms:
+`none`, `abs1d` (raster index), `abs2d` (Fourier features of absolute x,y),
+`geom` (RBF distance + angular harmonics), `geom_rbf` (distance only, the
+rotation-invariant half), `geom_shuf` (same machinery, shuffled coordinates, a
+capacity control). Metric: bits per patch code.
 
-**Cost:** an afternoon for the full sweep (3 arms × 2 seeds).
-**Pass:** true-layout bias ≥ baseline by >2% bits/code on held-out renders.
+**Cost:** ~1 h for 6 arms × 2 seeds on 8 CPU cores; data build ~3 min, cached.
+**Pass:** `geom` or `geom_rbf` beats `abs2d` by >2% bits/code on held-out
+renders, and `geom_shuf` stays near `none`.
 **Kill:** no gain. Then drop bridges 1–2 and go straight to R2, where topology
 is the computation rather than a position code.
 
-### R1 — does any of it transfer to text and code? (a day)
+**Result (6 arms × 2 seeds, 60 min).**
 
-**Question:** with the geometry defined over token positions (bridge 3) or over
-code structure (indentation, bracket depth, line distance), does the bias beat
-RoPE on a real corpus at matched parameters?
+| arm | bits/code | vs order |
+|---|---|---|
+| raster index (`abs1d`) | **4.534** | — |
+| absolute (x,y) (`abs2d`) | 4.558 | +0.023 |
+| distance + angle (`geom`) | 4.661 | +0.126 |
+| distance only (`geom_rbf`) | 4.669 | +0.135 |
+| shuffled control (`geom_shuf`) | 4.681 | +0.147 |
+| no position (`none`) | 4.700 | +0.166 |
 
-**Corpora:** pinned tiny-Shakespeare (~1.1 MB) and a pinned 2 MB Python subset,
-byte-level, so no tokenizer is in the comparison.
+Order beats every geometry arm by ≥0.12 bits, and the true geometry sits within
+0.03 bits of its shuffled control. Per layout, absolute position wins only on
+the 203-node hex drawing (5.812 vs 6.002); order wins on rings (4.065 vs 4.300)
+and chart (3.537 vs 3.803). Seed spread is ≤0.011 bits, so the ordering is not
+noise.
 
-**Method:** same harness, 5 epochs, 2 seeds, three drawings + random-layout
-control. Report bits/char and bits/byte, not loss.
+**Killed as stated, for a structural reason.** A causal next-token model is
+asked for token t+1, whose position is already fixed by the order; there is no
+query position for geometry to route to. Geometry is a *query-time* prior —
+masked reconstruction already showed it helps there — not a sequence prior.
+That kills bridge 1 (a drawing as a positional code) outright, and makes bridge
+3 (structure known from the data, e.g. an AST) the only remaining text route.
+R2 is unaffected and becomes the main line.
+
+### R1 — does the bias mechanism transfer to code structure? (a day)
+
+**Question:** when the relation is known from the data (indentation, bracket
+nesting, line distance, AST distance) rather than hypothesised from a drawing,
+does a pair bias beat RoPE on a byte-level code model at matched parameters?
+
+**Why narrowed:** R0 killed the drawing-as-positional-code idea, so R1 no
+longer tests that. What survives is the *mechanism* — a learned RBF/harmonic
+pair bias with a gate — applied to structure the corpus actually has. Text is
+dropped; code is where the structure is real and where the user wants to end up.
+
+**Corpora:** a pinned 2 MB Python subset, byte-level, so no tokenizer is in the
+comparison. Report bits/byte, not loss.
+
+**Method:** same harness, 5 epochs, 2 seeds. Arms: RoPE, absolute position,
+pair bias on raw distance, pair bias on structural features. A shuffled-feature
+control, as in R0.
 
 **Cost:** 6–8 h of CPU.
-**Pass:** within noise of RoPE, or better, on both corpora.
-**Kill:** >2% worse on either. Then the drawing is not a positional code, and
-the honest conclusion is that its value is as a *computation graph* (R2) or not
-at all.
+**Pass:** pair bias within noise of RoPE, or better, on held-out files.
+**Kill:** >2% worse. Then the mechanism is not a text prior either, and the
+repo's contribution to language modelling is the negative result plus the
+query-time story.
 
 ### R2 — is the drawing a better computation graph than a generic one? (days)
 
