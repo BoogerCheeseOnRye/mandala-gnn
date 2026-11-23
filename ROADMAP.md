@@ -127,29 +127,45 @@ That kills bridge 1 (a drawing as a positional code) outright, and makes bridge
 3 (structure known from the data, e.g. an AST) the only remaining text route.
 R2 is unaffected and becomes the main line.
 
-### R1 — does the bias mechanism transfer to code structure? (a day)
+### R1 — does the bias mechanism transfer to code structure? (running)
 
 **Question:** when the relation is known from the data (indentation, bracket
-nesting, line distance, AST distance) rather than hypothesised from a drawing,
-does a pair bias beat RoPE on a byte-level code model at matched parameters?
+depth, line distance) rather than hypothesised from a drawing, does a pair bias
+beat RoPE on a byte-level code model at matched parameters?
 
 **Why narrowed:** R0 killed the drawing-as-positional-code idea, so R1 no
-longer tests that. What survives is the *mechanism* — a learned RBF/harmonic
-pair bias with a gate — applied to structure the corpus actually has. Text is
-dropped; code is where the structure is real and where the user wants to end up.
+longer tests that. What survives is the *mechanism* — a learned RBF pair bias,
+here without the angular harmonics because code has no angle — applied to
+structure the corpus actually has. Text is dropped; code is where the structure
+is real.
 
-**Corpora:** a pinned 2 MB Python subset, byte-level, so no tokenizer is in the
-comparison. Report bits/byte, not loss.
+**Corpus:** a pinned subset of CPython 3.12.0's `Lib/` (tarball
+`codeload.github.com/python/cpython/tar.gz/refs/tags/v3.12.0`, extracted from
+`Lib/`), byte-level, 1.85 MB train / 169 KB held out, split by *file* so no
+held-out byte comes from a file the model saw. The corpus sha256 and the exact
+file list are in `runs/code/results.json`.
 
-**Method:** same harness, 5 epochs, 2 seeds. Arms: RoPE, absolute position,
-pair bias on raw distance, pair bias on structural features. A shuffled-feature
-control, as in R0.
+**Method** (`mandalanet/code.py`, `tools/code_experiment.py`): dim 96, 3 layers,
+4 heads, context 256, batch 4, 1200 steps (~1.2 M tokens, about 0.7 epochs),
+dropout 0.1, two seeds. Five arms that differ only in how attention learns
+position:
 
-**Cost:** 6–8 h of CPU.
-**Pass:** pair bias within noise of RoPE, or better, on held-out files.
-**Kill:** >2% worse. Then the mechanism is not a text prior either, and the
-repo's contribution to language modelling is the negative result plus the
-query-time story.
+| arm | position source |
+|---|---|
+| `rope` | rotary position on q/k — the baseline to beat |
+| `abs` | learned absolute position embedding |
+| `bias_dist` | learned bias from RBF(|i-j|); no RoPE, no abs |
+| `bias_struct` | bias from RBF(|i-j|) + indent, bracket depth, line distance, same-line flag; no RoPE, no abs |
+| `bias_shuf` | the same features with the structural channels permuted across positions — capacity control |
+
+In the three bias arms the bias is the *only* source of position, so this asks
+whether the mechanism can replace RoPE, not whether it can decorate it. Metric:
+bits/byte on held-out files.
+
+**Cost:** ~2.5 h of CPU for 5 arms × 2 seeds.
+**Pass:** a bias arm within noise of RoPE, or better.
+**Kill:** >2% worse than RoPE. Note that "within noise" is not a win: it means
+the mechanism is harmless, not that it is a code prior.
 
 ### R2 — is the drawing a better computation graph than a random one? (done, negative)
 

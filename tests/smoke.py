@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from mandalanet.data import recon_example
 from mandalanet.lattices import build_mesh
 from mandalanet.model import MandalaNet
+from mandalanet.code import CodeLM, pair_features
 from mandalanet.compute import GraphReasoner, chain_edges, distances, random_edges
 from mandalanet.seq import SeqLM
 from mandalanet.synth import LAYOUTS, sample
@@ -97,6 +98,32 @@ def main() -> None:
           "reach: AUC on a separable split")
     check(auc(torch.tensor([0.5, 0.5, 0.5, 0.5]), torch.tensor([0.0, 1.0, 0.0, 1.0])) == 0.5,
           "reach: AUC at chance on ties")
+
+    n = 24
+    d = torch.arange(n).float()
+    ind = torch.randint(0, 8, (n,)).float()
+    br = torch.randint(0, 8, (n,)).float()
+    ln = torch.cumsum(torch.randint(0, 3, (n,)).float(), 0)
+    fd = pair_features(d[None], ind[None], br[None], ln[None], "dist")
+    fs = pair_features(d[None], ind[None], br[None], ln[None], "struct")
+    check(fd.shape == (1, n, n, 8), "code: distance pair features")
+    check(fs.shape == (1, n, n, 15), "code: structural pair features")
+    cm = CodeLM(vocab=256, dim=32, depth=1, heads=4, ctx=n, pos="bias_struct",
+                dropout=0.0).eval()
+    a1 = torch.randint(0, 256, (2, n))
+    a2 = a1.clone()
+    a2[:, -1] = (a2[:, -1] + 1) % 256
+    with torch.no_grad():
+        o1, o2 = cm(a1, fs), cm(a2, fs)
+    check(torch.allclose(o1[:, :-1], o2[:, :-1]) and not torch.allclose(o1[:, -1], o2[:, -1]),
+          "code: causal mask holds under the pair bias")
+    for pos in ("rope", "abs", "bias_dist", "bias_struct", "bias_shuf"):
+        m = CodeLM(vocab=256, dim=32, depth=1, heads=4, ctx=n, pos=pos, dropout=0.0)
+        feats = fs if pos.startswith("bias") else None
+        if pos == "bias_dist":
+            feats = fd
+        out = m(torch.randint(0, 256, (2, n)), feats)
+        check(out.shape == (2, n, 256), f"code pos={pos}: logits shape")
 
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,
