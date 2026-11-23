@@ -47,6 +47,8 @@ COLORS = {"rope": BLUE, "abs": (120, 140, 200), "bias_dist": GREEN,
 LABELS = {"rope": "RoPE", "abs": "absolute", "bias_dist": "bias: distance only",
           "bias_struct": "bias: distance + structure",
           "bias_shuf": "bias: shuffled (control)"}
+XLABELS = {"rope": "RoPE", "abs": "absolute", "bias_dist": "distance\nonly",
+           "bias_struct": "distance\n+ structure", "bias_shuf": "shuffled\n(control)"}
 
 SKIP = ("/test/", "/tests/", "idle_test", "/test_")
 TARGET = 2_000_000
@@ -229,13 +231,17 @@ def evaluate(model, arm: str, corpus: dict, args, limit: int | None = None) -> d
 # figure
 # --------------------------------------------------------------------------- #
 def figure(path: str, results: list[dict], corpus: dict) -> str:
+    """Bits/byte relative to RoPE: the only scale on which the arms separate."""
     im, d = _canvas(1180, 560, "R1: does the pair-bias mechanism transfer to code?",
                     "CPython 3.12.0 Lib subset, byte level, held-out files · "
-                    "bits per byte · lower is better")
-    l, r, t, b = 110, 700, 140, 430
+                    "bits per byte relative to RoPE · lower is better")
     arms = [a for a in ARMS if any(x["arm"] == a for x in results)]
-    vals = [x["bits_per_byte"] for x in results]
-    lo, hi = min(vals) - 0.08, max(vals) + 0.05
+    base = [x["bits_per_byte"] for x in results if x["arm"] == "rope"]
+    bm = sum(base) / len(base)
+    delta = {a: [x["bits_per_byte"] - bm for x in results if x["arm"] == a] for a in arms}
+    lo = min(min(v) for v in delta.values() if v) - 0.02
+    hi = max(max(v) for v in delta.values() if v) + 0.20
+    l, r, t, b = 110, 700, 140, 430
 
     def py(v):
         return b - (v - lo) / (hi - lo) * (b - t)
@@ -244,34 +250,38 @@ def figure(path: str, results: list[dict], corpus: dict) -> str:
         v = lo + i * (hi - lo) / 4
         yy = py(v)
         d.line([l, yy, r, yy], fill=GRID, width=1)
-        d.text((l - 10, yy), f"{v:.2f}", fill=(150, 158, 172), anchor="rm", font=_font(12))
-    base = [x["bits_per_byte"] for x in results if x["arm"] == "rope"]
-    if base:
-        bl = sum(base) / len(base)
-        d.line([l, py(bl), r, py(bl)], fill=(120, 126, 140), width=1)
+        d.text((l - 10, yy), f"{v:+.2f}", fill=(150, 158, 172), anchor="rm", font=_font(12))
+    d.line([l, py(0.0), r, py(0.0)], fill=(150, 158, 172), width=1)
+    d.text((r + 8, py(0.0)), f"RoPE {bm:.3f}", fill=(190, 196, 208), anchor="lm",
+           font=_font(11))
 
     width = (r - l) / len(arms)
     for i, arm in enumerate(arms):
-        xs = [x["bits_per_byte"] for x in results if x["arm"] == arm]
+        vals = delta[arm]
         cx = l + (i + 0.5) * width
-        m = sum(xs) / len(xs)
-        d.rectangle([cx - width * 0.28, py(m), cx + width * 0.28, b], fill=COLORS[arm])
-        for v in xs:
+        m = sum(vals) / len(vals)
+        d.rectangle([cx - width * 0.28, py(m), cx + width * 0.28, py(0.0)], fill=COLORS[arm])
+        for v in vals:
             d.ellipse([cx - 3, py(v) - 3, cx + 3, py(v) + 3], fill=INK)
-        d.text((cx, b + 18), LABELS[arm].replace(": ", "\n"), fill=(190, 196, 208),
+        d.text((cx, b + 18), XLABELS[arm], fill=(190, 196, 208),
                anchor="ma", font=_font(11), align="center")
-        d.text((cx, py(m) - 14), f"{m:.3f}", fill=INK, anchor="ma", font=_font(12))
-    d.text((l, t - 24), "held-out bits/byte after training", fill=(190, 196, 208), font=_font(13))
+        y = min(py(m), py(0.0)) - 5
+        d.text((cx, y), f"{m:+.3f}", fill=INK, anchor="mb", font=_font(12))
+        d.text((cx, y - 15), f"{bm + m:.3f}", fill=DIM, anchor="mb", font=_font(11))
+    d.text((l, t - 24), "held-out bits/byte relative to RoPE (absolute value above it)",
+           fill=(190, 196, 208), font=_font(13))
 
     lx = 800
-    d.text((lx + 250, 128), "mean b/B", fill=DIM, anchor="rm", font=_font(12))
+    d.text((lx + 250, 128), "delta", fill=DIM, anchor="rm", font=_font(12))
+    d.text((lx + 330, 128), "b/B", fill=DIM, anchor="rm", font=_font(12))
     for i, arm in enumerate(arms):
         yy = 160 + i * 30
         d.rectangle([lx, yy - 6, lx + 12, yy + 6], fill=COLORS[arm])
         d.text((lx + 22, yy), LABELS[arm], fill=INK, anchor="lm", font=_font(13))
-        xs = [x["bits_per_byte"] for x in results if x["arm"] == arm]
-        d.text((lx + 250, yy), f"{sum(xs) / len(xs):.4f}", fill=INK, anchor="rm",
-               font=_font(13))
+        vals = delta[arm]
+        m = sum(vals) / len(vals)
+        d.text((lx + 250, yy), f"{m:+.3f}", fill=INK, anchor="rm", font=_font(13))
+        d.text((lx + 330, yy), f"{bm + m:.3f}", fill=INK, anchor="rm", font=_font(13))
     d.text((96, 500), f"{corpus['train_bytes'].numel():,} train / "
            f"{corpus['val_bytes'].numel():,} held-out bytes from "
            f"{len(corpus['files'])} files, split by file. Same parameters and steps in "

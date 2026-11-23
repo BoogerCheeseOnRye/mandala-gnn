@@ -15,6 +15,7 @@ cleanly than they would have been as demos.
 | classification, unseen rotations | 1.00 (3 drawings × 8 rotations, 4 held out) |
 | energy head | closed as a landscape; open as a selector (24/24, 19/24, 14/24) |
 | R0, geometry as a sequence prior | negative: order 4.534 bits/code, geometry 4.661, shuffled control 4.681 |
+| R1, pair bias on code | negative: 2.555 bits/byte vs 2.481 for RoPE (+3.0%); structure beats distance-only and shuffled controls |
 | R2, drawing as a computation graph | negative: drawing 0.996/1.000/1.000 AUC, matched random 1.000 everywhere |
 | cost | ~80 s per 400-step run on 8 CPU cores, 0.25 s inference |
 
@@ -60,7 +61,7 @@ Two consequences worth stating before the ladder:
 
 | piece | transfers to sequences? | how |
 |---|---|---|
-| `B(edge) = MLP(RBF(r), cos/sin kθ, radii, type)` | yes | relative-position bias on token pairs, whenever you can define a geometry for a pair |
+| `B(edge) = MLP(RBF(r), cos/sin kθ, radii, type)` | yes, but measured worse | relative-position bias on token pairs; R1 put it 3% behind RoPE on code |
 | learned edge gate `g_ij ∈ (0,1)` | yes | soft sparsity / learned attention mask; readable as "which relations mattered" |
 | `ChaosPyramid` gated residual pooling | yes | multi-resolution attention; already close to standard practice |
 | 6,946-param energy head | only as a ranker | needs pairs of completions of the same mask ordered by true error |
@@ -70,10 +71,10 @@ Two consequences worth stating before the ladder:
 
 ## The ladder
 
-Each rung is a question with a number attached. R0 and R2 are done, both
-negative and for different reasons (a sequence prior that has nothing to act
-on; a topology that is not a better router). R1 is narrowed to code structure;
-R3 needs a GPU; R4 needs R3.
+Each rung is a question with a number attached. R0, R1 and R2 are done, all
+negative and for different reasons: a sequence prior with nothing to act on, a
+positional mechanism that loses to RoPE, and a topology that is not a better
+router. R3 needs a GPU; R4 needs R3.
 
 ### R0 — does the bias work where the geometry is real? (hours)
 
@@ -127,7 +128,7 @@ That kills bridge 1 (a drawing as a positional code) outright, and makes bridge
 3 (structure known from the data, e.g. an AST) the only remaining text route.
 R2 is unaffected and becomes the main line.
 
-### R1 — does the bias mechanism transfer to code structure? (running)
+### R1 — does the bias mechanism transfer to code structure? (done, negative)
 
 **Question:** when the relation is known from the data (indentation, bracket
 depth, line distance) rather than hypothesised from a drawing, does a pair bias
@@ -166,6 +167,43 @@ bits/byte on held-out files.
 **Pass:** a bias arm within noise of RoPE, or better.
 **Kill:** >2% worse than RoPE. Note that "within noise" is not a win: it means
 the mechanism is harmless, not that it is a code prior.
+
+**Result** — held-out bits/byte, two seeds, at two step budgets:
+
+| arm | 300 steps | vs RoPE | 1200 steps | vs RoPE |
+|---|---|---|---|---|
+| RoPE | **3.229** | — | **2.481** | — |
+| bias: distance + structure | 3.370 | +4.4% | 2.555 | +3.0% |
+| bias: distance only | 3.423 | +6.0% | 2.612 | +5.3% |
+| bias: shuffled (control) | 3.441 | +6.6% | 2.651 | +6.8% |
+| absolute position | 3.613 | +11.9% | 3.345 | +34.8% |
+
+Seed spread is ≤0.006 at 300 steps and ≤0.010 at 1200, so every gap above is
+7–20× noise, and the ordering is identical at both budgets.
+
+**Verdict: killed as stated.** The structural bias is 3.0% worse than RoPE at
+the full budget — over the 2% kill line — and it had the advantage of being the
+only positional signal rather than competing with one. It is also slower to
+learn: the gap is *larger* at 300 steps (+4.4%) than at 1200 (+3.0%).
+
+Two things in the run are worth keeping even though the rung fails.
+
+* **The structural features carry real information.** Inside the bias family,
+  `distance + structure` beats `distance only` by 2.2% and the shuffled control
+  by 3.6% at 1200 steps (1.5% and 2.1% at 300). The shuffled control has the
+  same capacity and the same feature distribution with the channels permuted
+  across positions, so that gap is the information, not the machinery.
+  Indentation, bracket depth and line distance are learnable relations; they
+  are simply not worth 3% of bits/byte against RoPE.
+* **Absolute positions collapse** (+34.8%). With random windows, a small model
+  and byte-level code, learned offsets memorise rather than generalise. That is
+  the clearest argument in the whole repo *for* relative mechanisms — just not
+  for this one.
+
+**Caveat, stated plainly:** at 1200 steps the model is overfitting (train 1.13
+nats against 1.82 nats held out), so both columns are past-the-optimum
+checkpoints. They are matched across arms and the ranking does not move between
+them, but they are not each arm's best number.
 
 ### R2 — is the drawing a better computation graph than a random one? (done, negative)
 
@@ -260,8 +298,9 @@ it would pay for the effort.
 
 ### R3 — scale, if compute appears (GPU, weeks)
 
-**Recipe, not a run:** 50–300 M hybrid transformer on code + text, RoPE plus an
-optional geometric bias, AR objective, then an energy *reranker* trained on
+**Recipe, not a run:** 50–300 M hybrid transformer on code + text, RoPE as the
+position mechanism (R1 measured the pair bias 3% worse, so it is not in the
+default recipe), AR objective, then an energy *reranker* trained on
 quality-ordered pairs (same mask, different completions, ordered by true
 error). Evaluate bits/byte, HumanEval, MBPP. The energy component is allowed to
 help only where it is measured to help: constrained decoding, reranking, or
@@ -301,6 +340,7 @@ against random choice. Until that runs, the energy page says what it says.
 ## What would change the plan
 
 * R0 or R1 shows a real sequence gain → push the bias into R3 and publish it.
+  Neither did: R0 found no sequence prior, R1 found the bias 3% behind RoPE.
 * R2 had shown a topology gain → that would have been the paper, with the
   energy head as a side result. It did not: random wiring at matched degree is
   at least as good, so that route is closed rather than pending.

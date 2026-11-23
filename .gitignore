@@ -10,3 +10,5 @@ runs/energy/*.png
 runs/energy-*/*.png
 runs/seq/*.png
 runs/topology/*.png
+runs/code/*.png
+runs/code-*/*.png

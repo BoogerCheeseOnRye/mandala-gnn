@@ -1,0 +1,859 @@
+{
+  "config": {
+    "arms": [
+      "rope",
+      "abs",
+      "bias_dist",
+      "bias_struct",
+      "bias_shuf"
+    ],
+    "seeds": [
+      0,
+      1
+    ],
+    "ctx": 256,
+    "dim": 96,
+    "depth": 3,
+    "heads": 4,
+    "batch": 4,
+    "dropout": 0.1,
+    "lr": 0.001,
+    "steps": 300,
+    "warmup": 50,
+    "threads": 8,
+    "corpus": "runs/code/corpus.pt",
+    "corpus_src": "/tmp/opencode/cpy/cpython-3.12.0/Lib",
+    "rebuild_corpus": false,
+    "out": "runs/code-300"
+  },
+  "corpus_sha256": "09fb46217295054631386571409f5a949b8c65c1f5c53faed1640c97b38bf386",
+  "files": [
+    {
+      "path": "__future__.py",
+      "bytes": 5218,
+      "split": "train"
+    },
+    {
+      "path": "_compat_pickle.py",
+      "bytes": 8761,
+      "split": "train"
+    },
+    {
+      "path": "_osx_support.py",
+      "bytes": 21787,
+      "split": "train"
+    },
+    {
+      "path": "_sitebuiltins.py",
+      "bytes": 3128,
+      "split": "train"
+    },
+    {
+      "path": "_weakrefset.py",
+      "bytes": 5893,
+      "split": "train"
+    },
+    {
+      "path": "ast.py",
+      "bytes": 63951,
+      "split": "train"
+    },
+    {
+      "path": "asyncio/base_subprocess.py",
+      "bytes": 8869,
+      "split": "train"
+    },
+    {
+      "path": "asyncio/events.py",
+      "bytes": 29125,
+      "split": "train"
+    },
+    {
+      "path": "asyncio/locks.py",
+      "bytes": 18994,
+      "split": "train"
+    },
+    {
+      "path": "asyncio/queues.py",
+      "bytes": 7974,
+      "split": "val"
+    },
+    {
+      "path": "asyncio/sslproto.py",
+      "bytes": 31505,
+      "split": "train"
+    },
+    {
+      "path": "asyncio/subprocess.py",
+      "bytes": 7653,
+      "split": "train"
+    },
+    {
+      "path": "asyncio/timeouts.py",
+      "bytes": 5130,
+      "split": "train"
+    },
+    {
+      "path": "asyncio/unix_events.py",
+      "bytes": 53616,
+      "split": "train"
+    },
+    {
+      "path": "base64.py",
+      "bytes": 20603,
+      "split": "train"
+    },
+    {
+      "path": "bz2.py",
+      "bytes": 11847,
+      "split": "train"
+    },
+    {
+      "path": "cgi.py",
+      "bytes": 34420,
+      "split": "train"
+    },
+    {
+      "path": "cmd.py",
+      "bytes": 14873,
+      "split": "train"
+    },
+    {
+      "path": "codeop.py",
+      "bytes": 5599,
+      "split": "train"
+    },
+    {
+      "path": "compileall.py",
+      "bytes": 20507,
+      "split": "val"
+    },
+    {
+      "path": "concurrent/futures/thread.py",
+      "bytes": 8884,
+      "split": "train"
+    },
+    {
+      "path": "copy.py",
+      "bytes": 8412,
+      "split": "train"
+    },
+    {
+      "path": "csv.py",
+      "bytes": 16386,
+      "split": "train"
+    },
+    {
+      "path": "ctypes/_endian.py",
+      "bytes": 2517,
+      "split": "train"
+    },
+    {
+      "path": "ctypes/wintypes.py",
+      "bytes": 5629,
+      "split": "train"
+    },
+    {
+      "path": "curses/has_key.py",
+      "bytes": 5634,
+      "split": "train"
+    },
+    {
+      "path": "dbm/__init__.py",
+      "bytes": 5882,
+      "split": "train"
+    },
+    {
+      "path": "email/_encoded_words.py",
+      "bytes": 8541,
+      "split": "train"
+    },
+    {
+      "path": "email/base64mime.py",
+      "bytes": 3551,
+      "split": "train"
+    },
+    {
+      "path": "email/errors.py",
+      "bytes": 3735,
+      "split": "val"
+    },
+    {
+      "path": "email/header.py",
+      "bytes": 24092,
+      "split": "train"
+    },
+    {
+      "path": "email/message.py",
+      "bytes": 48032,
+      "split": "train"
+    },
+    {
+      "path": "email/parser.py",
+      "bytes": 4975,
+      "split": "train"
+    },
+    {
+      "path": "email/utils.py",
+      "bytes": 12271,
+      "split": "train"
+    },
+    {
+      "path": "encodings/bz2_codec.py",
+      "bytes": 2249,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp1006.py",
+      "bytes": 13568,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp1140.py",
+      "bytes": 13105,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp1252.py",
+      "bytes": 13511,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp1255.py",
+      "bytes": 12466,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp1258.py",
+      "bytes": 13364,
+      "split": "val"
+    },
+    {
+      "path": "encodings/cp437.py",
+      "bytes": 34564,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp737.py",
+      "bytes": 34681,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp852.py",
+      "bytes": 35002,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp857.py",
+      "bytes": 33908,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp861.py",
+      "bytes": 34633,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp864.py",
+      "bytes": 33663,
+      "split": "train"
+    },
+    {
+      "path": "encodings/cp869.py",
+      "bytes": 32965,
+      "split": "train"
+    },
+    {
+      "path": "encodings/hp_roman8.py",
+      "bytes": 13475,
+      "split": "train"
+    },
+    {
+      "path": "encodings/iso8859_10.py",
+      "bytes": 13589,
+      "split": "train"
+    },
+    {
+      "path": "encodings/iso8859_14.py",
+      "bytes": 13652,
+      "split": "val"
+    },
+    {
+      "path": "encodings/iso8859_2.py",
+      "bytes": 13404,
+      "split": "train"
+    },
+    {
+      "path": "encodings/iso8859_5.py",
+      "bytes": 13015,
+      "split": "train"
+    },
+    {
+      "path": "encodings/iso8859_8.py",
+      "bytes": 11036,
+      "split": "train"
+    },
+    {
+      "path": "encodings/koi8_t.py",
+      "bytes": 13193,
+      "split": "train"
+    },
+    {
+      "path": "encodings/mac_arabic.py",
+      "bytes": 36467,
+      "split": "train"
+    },
+    {
+      "path": "encodings/mac_farsi.py",
+      "bytes": 15170,
+      "split": "train"
+    },
+    {
+      "path": "encodings/mac_latin2.py",
+      "bytes": 14118,
+      "split": "train"
+    },
+    {
+      "path": "encodings/mac_turkish.py",
+      "bytes": 13513,
+      "split": "train"
+    },
+    {
+      "path": "encodings/punycode.py",
+      "bytes": 6883,
+      "split": "train"
+    },
+    {
+      "path": "encodings/utf_16.py",
+      "bytes": 5236,
+      "split": "val"
+    },
+    {
+      "path": "encodings/uu_codec.py",
+      "bytes": 2851,
+      "split": "train"
+    },
+    {
+      "path": "filecmp.py",
+      "bytes": 10187,
+      "split": "train"
+    },
+    {
+      "path": "fractions.py",
+      "bytes": 38057,
+      "split": "train"
+    },
+    {
+      "path": "genericpath.py",
+      "bytes": 5301,
+      "split": "train"
+    },
+    {
+      "path": "gettext.py",
+      "bytes": 21073,
+      "split": "train"
+    },
+    {
+      "path": "gzip.py",
+      "bytes": 24859,
+      "split": "train"
+    },
+    {
+      "path": "hmac.py",
+      "bytes": 7717,
+      "split": "train"
+    },
+    {
+      "path": "html/parser.py",
+      "bytes": 17054,
+      "split": "train"
+    },
+    {
+      "path": "http/cookiejar.py",
+      "bytes": 77438,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/autocomplete.py",
+      "bytes": 9354,
+      "split": "val"
+    },
+    {
+      "path": "idlelib/browser.py",
+      "bytes": 8586,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/codecontext.py",
+      "bytes": 11420,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/config_key.py",
+      "bytes": 15230,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/debugobj.py",
+      "bytes": 4052,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/format.py",
+      "bytes": 15777,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/help_about.py",
+      "bytes": 8909,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/iomenu.py",
+      "bytes": 15971,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/multicall.py",
+      "bytes": 18629,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/pathbrowser.py",
+      "bytes": 3193,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/pyshell.py",
+      "bytes": 62467,
+      "split": "val"
+    },
+    {
+      "path": "idlelib/replace.py",
+      "bytes": 9999,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/runscript.py",
+      "bytes": 8273,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/searchbase.py",
+      "bytes": 7856,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/squeezer.py",
+      "bytes": 12834,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/tooltip.py",
+      "bytes": 6471,
+      "split": "train"
+    },
+    {
+      "path": "idlelib/window.py",
+      "bytes": 2616,
+      "split": "train"
+    },
+    {
+      "path": "imaplib.py",
+      "bytes": 53688,
+      "split": "train"
+    },
+    {
+      "path": "importlib/_bootstrap.py",
+      "bytes": 56842,
+      "split": "train"
+    },
+    {
+      "path": "importlib/metadata/__init__.py",
+      "bytes": 28726,
+      "split": "train"
+    },
+    {
+      "path": "importlib/metadata/_itertools.py",
+      "bytes": 2068,
+      "split": "val"
+    },
+    {
+      "path": "importlib/resources/_common.py",
+      "bytes": 5459,
+      "split": "train"
+    },
+    {
+      "path": "importlib/resources/readers.py",
+      "bytes": 4303,
+      "split": "train"
+    },
+    {
+      "path": "io.py",
+      "bytes": 3502,
+      "split": "train"
+    },
+    {
+      "path": "json/decoder.py",
+      "bytes": 12473,
+      "split": "train"
+    },
+    {
+      "path": "json/tool.py",
+      "bytes": 3339,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/fixer_base.py",
+      "bytes": 6690,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/fixes/fix_dict.py",
+      "bytes": 3760,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/fixes/fix_exitfunc.py",
+      "bytes": 2495,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/fixes/fix_idioms.py",
+      "bytes": 4876,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/fixes/fix_itertools_imports.py",
+      "bytes": 2086,
+      "split": "val"
+    },
+    {
+      "path": "lib2to3/fixes/fix_next.py",
+      "bytes": 3174,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/fixes/fix_raise.py",
+      "bytes": 2926,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/fixes/fix_urllib.py",
+      "bytes": 8367,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/patcomp.py",
+      "bytes": 7054,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/pgen2/grammar.py",
+      "bytes": 5552,
+      "split": "train"
+    },
+    {
+      "path": "lib2to3/pgen2/tokenize.py",
+      "bytes": 21119,
+      "split": "train"
+    },
+    {
+      "path": "linecache.py",
+      "bytes": 5690,
+      "split": "train"
+    },
+    {
+      "path": "logging/handlers.py",
+      "bytes": 62426,
+      "split": "train"
+    },
+    {
+      "path": "mailcap.py",
+      "bytes": 9333,
+      "split": "train"
+    },
+    {
+      "path": "msilib/__init__.py",
+      "bytes": 17655,
+      "split": "val"
+    },
+    {
+      "path": "multiprocessing/connection.py",
+      "bytes": 40590,
+      "split": "train"
+    },
+    {
+      "path": "multiprocessing/forkserver.py",
+      "bytes": 12134,
+      "split": "train"
+    },
+    {
+      "path": "multiprocessing/pool.py",
+      "bytes": 32760,
+      "split": "train"
+    },
+    {
+      "path": "multiprocessing/popen_spawn_posix.py",
+      "bytes": 2029,
+      "split": "train"
+    },
+    {
+      "path": "multiprocessing/queues.py",
+      "bytes": 12080,
+      "split": "train"
+    },
+    {
+      "path": "multiprocessing/resource_tracker.py",
+      "bytes": 8973,
+      "split": "train"
+    },
+    {
+      "path": "multiprocessing/spawn.py",
+      "bytes": 9644,
+      "split": "train"
+    },
+    {
+      "path": "netrc.py",
+      "bytes": 6922,
+      "split": "train"
+    },
+    {
+      "path": "nturl2path.py",
+      "bytes": 2887,
+      "split": "train"
+    },
+    {
+      "path": "operator.py",
+      "bytes": 10965,
+      "split": "val"
+    },
+    {
+      "path": "pathlib.py",
+      "bytes": 51149,
+      "split": "train"
+    },
+    {
+      "path": "pipes.py",
+      "bytes": 8978,
+      "split": "train"
+    },
+    {
+      "path": "plistlib.py",
+      "bytes": 28342,
+      "split": "train"
+    }
+  ],
+  "results": [
+    {
+      "arm": "rope",
+      "seed": 0,
+      "params": 385120,
+      "bits_per_byte": 3.2309875793793825,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.252898931503296,
+          "bits_per_byte": 3.2488579805849453,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.5555472373962402,
+          "bits_per_byte": 3.2309875793793825,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 199.4
+    },
+    {
+      "arm": "rope",
+      "seed": 1,
+      "params": 385120,
+      "bits_per_byte": 3.22661870905053,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.5727739334106445,
+          "bits_per_byte": 3.2407724082673894,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.565401077270508,
+          "bits_per_byte": 3.22661870905053,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 182.2
+    },
+    {
+      "arm": "abs",
+      "seed": 0,
+      "params": 409696,
+      "bits_per_byte": 3.611512996542238,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.4702062606811523,
+          "bits_per_byte": 3.606320616816871,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.834829807281494,
+          "bits_per_byte": 3.611512996542238,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 169.2
+    },
+    {
+      "arm": "abs",
+      "seed": 1,
+      "params": 409696,
+      "bits_per_byte": 3.6145003690630957,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.789329767227173,
+          "bits_per_byte": 3.6182614061102516,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.7855031490325928,
+          "bits_per_byte": 3.6145003690630957,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 168.6
+    },
+    {
+      "arm": "bias_dist",
+      "seed": 0,
+      "params": 386380,
+      "bits_per_byte": 3.4280194285539642,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.348540782928467,
+          "bits_per_byte": 3.3923095170901716,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.6659598350524902,
+          "bits_per_byte": 3.4280194285539642,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 325.8
+    },
+    {
+      "arm": "bias_dist",
+      "seed": 1,
+      "params": 386380,
+      "bits_per_byte": 3.4170824985747377,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.651212692260742,
+          "bits_per_byte": 3.3677536048897787,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.63948130607605,
+          "bits_per_byte": 3.4170824985747377,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 333.6
+    },
+    {
+      "arm": "bias_struct",
+      "seed": 0,
+      "params": 387052,
+      "bits_per_byte": 3.3672112488190584,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.3621745109558105,
+          "bits_per_byte": 3.3733964233525384,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.6070139408111572,
+          "bits_per_byte": 3.3672112488190584,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 376.9
+    },
+    {
+      "arm": "bias_struct",
+      "seed": 1,
+      "params": 387052,
+      "bits_per_byte": 3.373568434026715,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.6503121852874756,
+          "bits_per_byte": 3.380409374411332,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.627044916152954,
+          "bits_per_byte": 3.373568434026715,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 381.9
+    },
+    {
+      "arm": "bias_shuf",
+      "seed": 0,
+      "params": 387052,
+      "bits_per_byte": 3.4343764063401205,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.6995036602020264,
+          "bits_per_byte": 3.3802356788408945,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.450150489807129,
+          "bits_per_byte": 3.4343764063401205,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 380.5
+    },
+    {
+      "arm": "bias_shuf",
+      "seed": 1,
+      "params": 387052,
+      "bits_per_byte": 3.4470970244160966,
+      "curve": [
+        {
+          "step": 150,
+          "train_loss": 2.693763017654419,
+          "bits_per_byte": 3.4083247653231705,
+          "bytes": 63744
+        },
+        {
+          "step": 300,
+          "train_loss": 2.4940032958984375,
+          "bits_per_byte": 3.4470970244160966,
+          "bytes": 168960
+        }
+      ],
+      "seconds": 383.1
+    }
+  ]
+}

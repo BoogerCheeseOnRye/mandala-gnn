@@ -119,6 +119,37 @@ whose position is already fixed by the order, so there is no query position for
 the geometry to route to. Geometry is a query-time prior — which is why it helps
 masked reconstruction and not next-token prediction.
 
+**R1 — the pair-bias mechanism on code** (`runs/code/results.json`). R0 killed
+the drawing as a positional code, so R1 tests what survived: the mechanism — a
+learned pair bias over relative position, plus structure the corpus actually has
+(indentation, bracket depth, line distance). Corpus is a pinned CPython 3.12.0
+`Lib/` subset, byte level, split by file: 1.85 MB train / 169 KB held out.
+Five arms, dim 96, 3 layers, context 256, 1,200 steps, two seeds. In the three
+bias arms the bias is the **only** source of position, so the question is
+whether it can replace RoPE, not decorate it.
+
+| arm | bits/byte | vs RoPE |
+|---|---|---|
+| RoPE | **2.481** | — |
+| bias: distance + structure | 2.555 | +3.0% |
+| bias: distance only | 2.612 | +5.3% |
+| bias: shuffled (control) | 2.651 | +6.8% |
+| absolute position | 3.345 | +34.8% |
+
+Seed spread ≤0.010, so every gap is 7–20× noise, and the ordering is identical
+at 300 steps (RoPE 3.229, structure 3.370, distance 3.423, shuffled 3.441,
+absolute 3.613). RoPE wins; the rung is killed at its 2% threshold.
+
+The useful detail is *inside* the bias family: `distance + structure` beats
+`distance only` by 2.2% and the shuffled control by 3.6%. The shuffled control
+has the same capacity and the same feature distribution, so that gap is the
+information rather than the machinery — indentation, bracket depth and line
+distance are real, learnable relations. They are just not worth 3% of
+bits/byte. Absolute positions collapse (+34.8%), which is the expected failure
+for learned offsets on random windows.
+
+![R1: bits/byte relative to RoPE](img/code-r1.png)
+
 **R2 — the drawing as a computation graph** (`runs/topology/reach.json`). A
 recurrent graph net with weights shared across steps, state on the nodes, and
 messages along a fixed edge set, asked "is the target within k hops of the
