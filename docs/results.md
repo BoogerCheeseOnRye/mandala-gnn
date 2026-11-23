@@ -103,6 +103,47 @@ because with no edges and no pooling every hidden cell has identical input.
   essential. It is worth re-running with a fixed attention temperature to
   separate the two.
 
+## Do the drawings carry beyond reconstruction?
+
+Two follow-up experiments, both negative. Designs, costs and kill criteria are in
+`ROADMAP.md`; the raw numbers are in the JSON next to each run.
+
+**R0 — geometry as a sequence prior** (`runs/seq/results.json`). Six matched
+causal transformers over scanline-ordered patch codes of synthetic renders of
+all three layouts (600 train / 75 held-out per layout). Order wins: raster
+index **4.534** bits/code, absolute (x,y) 4.558, distance+angle 4.661, distance
+only 4.669, shuffled-coordinate control 4.681, no position 4.700; seed spread
+≤0.011. The true geometry is within 0.03 bits of its shuffled control, so the
+bias is inert. The reason is structural: an AR model is asked for token t+1,
+whose position is already fixed by the order, so there is no query position for
+the geometry to route to. Geometry is a query-time prior — which is why it helps
+masked reconstruction and not next-token prediction.
+
+**R2 — the drawing as a computation graph** (`runs/topology/reach.json`). A
+recurrent graph net with weights shared across steps, state on the nodes, and
+messages along a fixed edge set, asked "is the target within k hops of the
+source?". k is chosen per graph for a 50/50 question and the model gets exactly
+k steps, so no graph is asked something its wiring cannot answer; pairs are
+sampled half positive; 20% of source nodes are held out. AUC, two seeds:
+
+| layout | drawing | random (same nodes/edges) | rewired (same degrees) | chain | star |
+|---|---|---|---|---|---|
+| chart (25 nodes, 64 edges) | 1.000 / 1.000 | 1.000 / 1.000 | 1.000 | 1.000 / 0.693 | 1.000 |
+| rings (61, 186) | 1.000 / 1.000 | 1.000 / 1.000 | 1.000 | 0.325 / 0.673 | 1.000 |
+| hex (203, 1046) | 0.996 / 0.982 | 1.000 / 1.000 | 1.000 | 0.573 / 0.593 | 1.000 |
+
+The drawing ties a connected random graph at identical node and edge counts on
+chart and rings, and trails it on hex. The rewired control — the drawing's exact
+degree sequence, random wiring — is indistinguishable from the random graph, so
+the deficit is the drawing's specific edges: at fixed edges a mesh has diameter
+12 where random has 4, and needs more hops (k=4 vs k=2) for the same question.
+Random wiring at fixed degree is an expander; a lattice is not. Chains fail
+outright, with the training loss pinned at ln 2 = 0.6931 at one or more
+checkpoints: a 16-hop signal under mean aggregation on a degree-2 path is
+attenuated by about 2^-16, so there is no gradient to learn from.
+
+Figure: `runs/topology/reach-task.png`.
+
 ## Caveats
 
 * One drawing, two seeds, 300-400 steps. Differences under ~0.02 r are noise;

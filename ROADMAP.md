@@ -14,12 +14,16 @@ cleanly than they would have been as demos.
 | masked reconstruction, wedge r | 0.9057 / 0.7663 / 0.9357 |
 | classification, unseen rotations | 1.00 (3 drawings × 8 rotations, 4 held out) |
 | energy head | closed as a landscape; open as a selector (24/24, 19/24, 14/24) |
+| R0, geometry as a sequence prior | negative: order 4.534 bits/code, geometry 4.661, shuffled control 4.681 |
+| R2, drawing as a computation graph | negative: drawing 0.996/1.000/1.000 AUC, matched random 1.000 everywhere |
 | cost | ~80 s per 400-step run on 8 CPU cores, 0.25 s inference |
 
 The two things that actually replicate are the **symmetry-aware radial
 attention** (RBF distance + angular harmonics + learned edge gate) and the
 **pyramid**. The hand-drawn lattice itself did not earn its keep at this task
-scale. Any plan that assumes otherwise is starting from the wrong result.
+scale, and R2 (below) tested the strongest remaining version of that claim — the
+lattice as a computation graph — and it did not hold either. Any plan that
+assumes otherwise is starting from the wrong result.
 
 ## The distance to "chat and code", in hours
 
@@ -66,9 +70,10 @@ Two consequences worth stating before the ladder:
 
 ## The ladder
 
-Each rung is a question with a number attached. R0 is done (negative, and the
-reason is structural); R1 is narrowed to code structure; R2 is the real test of
-the thesis and takes days; R3 needs a GPU; R4 needs R3.
+Each rung is a question with a number attached. R0 and R2 are done, both
+negative and for different reasons (a sequence prior that has nothing to act
+on; a topology that is not a better router). R1 is narrowed to code structure;
+R3 needs a GPU; R4 needs R3.
 
 ### R0 — does the bias work where the geometry is real? (hours)
 
@@ -146,23 +151,96 @@ control, as in R0.
 repo's contribution to language modelling is the negative result plus the
 query-time story.
 
-### R2 — is the drawing a better computation graph than a generic one? (days)
+### R2 — is the drawing a better computation graph than a random one? (done, negative)
 
-**Question:** give a small model a multi-step task where the computation graph
-is explicit (pointer chasing on a grid, multi-digit addition with carries).
-Put its state on the nodes and let messages follow the drawing's edges. Does
-hex/rings/chart beat a chain, a star, a fully connected graph, and a random
-graph of the same size and degree?
+**Question:** put a recurrent net's state on the drawing's nodes, let messages
+follow its edges for k steps, and ask whether a target node is within k hops of
+a source node. Does the drawing compute as well as a *connected* random graph
+with exactly the same node and edge counts, and better than a chain or a star?
 
-**Why it matters:** this is the project's actual claim — *topology from the
-drawings as layers* — and it does not require the lattice to be a language
-model. It uses all three drawings at once, which the recon task never did.
+**Why it matters:** this is the project's actual claim — topology from the
+drawings as layers — and it does not require the lattice to be a language
+model. It also uses all three drawings at once, which the reconstruction task
+never really did.
 
-**Cost:** 2–4 days of CPU for a sweep with 2 seeds.
-**Pass:** drawing topology beats random and chain on held-out instances of two
-different tasks, at matched parameters and steps.
-**Kill:** no consistent margin. Then the drawings are an aesthetic and a
-dataset, and the repo should say so.
+**Method.** `mandalanet/compute.py` is a GRU cell with weights shared across
+steps, mean-aggregated messages over a fixed edge set, and no node embeddings.
+`tools/reach_task.py` runs the probe. k is chosen *per graph* as the hop budget
+whose positive rate is closest to 50%, and the model gets exactly k steps, so
+no substrate is asked something its own wiring cannot answer. Pairs are sampled
+half positive, half negative; 20% of source nodes are never trained on. The
+primary metric is AUC, which is threshold-free and independent of the class
+mix. Substrates: the drawing (edges symmetrised — chart and rings ship one-way
+edges), a connected random graph with identical node and edge counts, a
+double-edge-swapped copy of the drawing (identical degrees, no geometry), a
+chain and a star. 500 steps, dim 48, batch 32, two seeds (rewired: one).
+
+The first version of this task regressed the BFS distance to every node
+(`tools/topology_task.py`, kept in `runs/topology/results.json` as the pilot).
+It was not a fair comparison: the drawings' diameter is 6, so the answer sat in
+a handful of classes whose mix differs per graph, and balanced accuracy mostly
+measured those priors. Chart saturated for every substrate, rings favoured
+random, hex was under-trained at 500 steps. The binary probe replaced it.
+
+**Result** (AUC and balanced accuracy per seed; k is each graph's own hop
+budget, diam its diameter):
+
+| layout | graph | k | diam | edges | AUC (per seed) | balanced acc |
+|---|---|---|---|---|---|---|
+| chart | drawing | 2 | 6 | 64 | 1.000/1.000 | 1.000/1.000 |
+| chart | random | 2 | 4 | 64 | 1.000/1.000 | 1.000/1.000 |
+| chart | rewired | 2 | 4 | 64 | 1.000 | 1.000 |
+| chart | chain | 7 | 24 | 24 | 1.000/0.693 | 1.000/0.608 |
+| chart | star | 1 | 2 | 24 | 1.000/1.000 | 1.000/1.000 |
+| rings | drawing | 3 | 6 | 186 | 1.000/1.000 | 1.000/1.000 |
+| rings | random | 2 | 4 | 186 | 1.000/1.000 | 1.000/1.000 |
+| rings | rewired | 2 | 4 | 186 | 1.000 | 1.000 |
+| rings | chain | 16 | 60 | 60 | 0.325/0.673 | 0.542/0.567 |
+| rings | star | 1 | 2 | 60 | 1.000/1.000 | 1.000/1.000 |
+| hex | drawing | 4 | 12 | 1046 | 0.996/0.982 | 0.982/0.951 |
+| hex | random | 2 | 4 | 1046 | 1.000/1.000 | 1.000/1.000 |
+| hex | rewired | 2 | 4 | 1046 | 1.000 | 1.000 |
+| hex | chain | 16 | 202 | 202 | 0.573/0.593 | 0.545/0.573 |
+| hex | star | 1 | 2 | 202 | 1.000/1.000 | 0.928/0.928 |
+
+**Verdict: killed as stated.** Nothing beats the matched random graph. The
+drawing ties it on chart and rings (both 1.000) and trails it slightly on hex
+(AUC 0.996/0.982 vs 1.000/1.000, balanced 0.982/0.951 vs 1.000). It also
+converges later: at step 166, rings drawing 0.945/0.573 against random
+1.000/1.000; hex 0.924/0.835 against 1.000/1.000.
+
+The rewired control is the sharp part. It has the drawing's degree sequence and
+edge count exactly, random wiring, and it is indistinguishable from the random
+graph (1.000 everywhere, diameter 4). So the drawing's deficit is not degree
+heterogeneity interacting with mean aggregation; it is its *specific* wiring.
+At fixed nodes and edges a mesh is a longer graph (diameter 12 vs 4 on hex) and
+needs more hops for the same question (k=4 vs k=2). Random wiring at fixed
+degree is an expander; a lattice is not. On a reachability question that is the
+whole difference, and it favours random.
+
+Chains are the only outright failures, and they fail measurably: on rings and
+hex the training loss sits at exactly ln 2 = 0.6931 at one or more checkpoints —
+the output never leaves the constant predictor — and AUC swings 0.325–0.673
+across seeds. A 16-hop signal under mean aggregation on a degree-2 path is
+attenuated by about 2^-16, so there is no gradient to learn from. That is a
+property of a path, not evidence for the drawing, and it makes a chain the
+wrong control for this task. Stars pass trivially because k=1 asks "is it a
+direct neighbour", which hub/leaf structure answers in one step.
+
+**Consequence.** Topology is not the ingredient. The drawing is *sufficient*
+(1.000 on two of three layouts) but not *superior*, and where it differs it is
+worse. R3 and R4 are therefore built on the mechanism that did replicate — the
+RBF/harmonic pair bias, the learned edge gate, the pyramid — and not on the
+edges. This agrees with the reconstruction ablation (rewired ≈ hex) and with R0
+(geometry inert as a sequence prior).
+
+**What this does not show.** Not that geometry never helps. It shows that on a
+reachability question — where random expanders are provably good routers — the
+drawing is not a better place to compute. A task defined on the drawing's own
+coordinates (same sector, same ring) would favour it by construction and would
+not be evidence. A task whose *structure* matches the drawing's symmetry without
+being its coordinates is the untested middle; nothing in these results suggests
+it would pay for the effort.
 
 ### R3 — scale, if compute appears (GPU, weeks)
 
@@ -207,8 +285,8 @@ against random choice. Until that runs, the energy page says what it says.
 ## What would change the plan
 
 * R0 or R1 shows a real sequence gain → push the bias into R3 and publish it.
-* R2 shows a topology gain → that is the paper, and the energy head becomes a
-  side result.
-* All three fail → the repo's contribution is the measured negative result
-  plus the reusable layers, and the next project starts from the layers, not
-  from the drawings.
+* R2 had shown a topology gain → that would have been the paper, with the
+  energy head as a side result. It did not: random wiring at matched degree is
+  at least as good, so that route is closed rather than pending.
+* What is left is the measured negative result plus the reusable layers. The
+  next project starts from the layers, not from the drawings.

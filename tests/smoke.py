@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from mandalanet.data import recon_example
 from mandalanet.lattices import build_mesh
 from mandalanet.model import MandalaNet
+from mandalanet.compute import GraphReasoner, chain_edges, distances, random_edges
 from mandalanet.seq import SeqLM
 from mandalanet.synth import LAYOUTS, sample
 
@@ -68,6 +69,34 @@ def main() -> None:
         check(p.shape[1] == 16 and c.shape == (p.shape[0], 2),
               f"synth {layout}: {p.shape[0]} nodes, 4x4 patches")
         check(float(img.min()) >= 0 and float(img.max()) <= 1, f"synth {layout}: image range")
+
+    ce = chain_edges(9)
+    dist = distances(9, ce, 5)
+    check(int(dist[0, 8]) == 5 and int(dist[0, 0]) == 0, "chain: BFS distances")
+    req = GraphReasoner(dim=16, classes=6, steps=5)
+    out = req(torch.eye(9)[:4], ce)
+    check(out.shape == (4, 9, 6), "reasoner: per-node distance logits")
+    re = random_edges(12, 12, seed=0)
+    a = torch.zeros(12, 12)
+    a[re[0], re[1]] = 1
+    check(bool(torch.equal(a, a.T)), "random edges: symmetric")
+    check(bool((distances(12, re, 12) < 12).all()), "random edges: connected")
+
+    from tools.reach_task import auc, choose_k, encode, pair_sets
+
+    d9 = distances(9, chain_edges(9), 9)
+    k9, rate9 = choose_k(d9)
+    check(1 <= k9 <= 16 and abs(rate9 - 0.5) <= 0.1,
+          f"reach: k chosen near balance (k={k9}, rate={rate9:.2f})")
+    pos, neg = pair_sets(d9, 2, torch.arange(9))
+    check(pos.shape[1] == 2 and neg.shape[1] == 2, "reach: pair sets are (pair, 2)")
+    x = encode(torch.tensor([[0, 3], [4, 1]]), 9)
+    check(x.shape == (2, 9, 2) and float(x[0, 0, 0]) == 1 and float(x[0, 3, 1]) == 1,
+          "reach: source and target channels")
+    check(auc(torch.tensor([0.1, 0.2, 0.8, 0.9]), torch.tensor([0.0, 0.0, 1.0, 1.0])) == 1.0,
+          "reach: AUC on a separable split")
+    check(auc(torch.tensor([0.5, 0.5, 0.5, 0.5]), torch.tensor([0.0, 1.0, 0.0, 1.0])) == 0.5,
+          "reach: AUC at chance on ties")
 
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,

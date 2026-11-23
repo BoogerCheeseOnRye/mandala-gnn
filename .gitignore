@@ -9,3 +9,4 @@ runs/**/*.pt
 runs/energy/*.png
 runs/energy-*/*.png
 runs/seq/*.png
+runs/topology/*.png
