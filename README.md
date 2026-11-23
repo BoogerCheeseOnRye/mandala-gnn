@@ -154,6 +154,15 @@ What survives scrutiny:
   6-point win with square patches disappears with disc patches - it was patch
   tiling, not topology.
 
+Beyond reconstruction, three transfer experiments test the lattice directly,
+and all three come out negative: the drawing is not a positional prior for a
+language model (R0 — 4.661 bits/code against 4.534 for plain order, and within
+0.03 of a shuffled control), the pair-bias mechanism is 3% behind RoPE on
+byte-level code (R1), and the drawing is not a better computation graph than a
+random one with the same nodes and edges (R2 — 0.996/0.982 against 1.000 on the
+203-node layout, with a degree-matched rewired control at 1.000). Designs,
+costs and kill criteria: **[ROADMAP.md](ROADMAP.md)**.
+
 Full tables, both patch shapes, all seeds: **[docs/results.md](docs/results.md)**,
 and as raw files on Hugging Face:
 [huggingface.co/datasets/BoogerCheeseOnRye/mandala-gnn-ablations](https://huggingface.co/datasets/BoogerCheeseOnRye/mandala-gnn-ablations).
