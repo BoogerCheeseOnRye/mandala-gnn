@@ -142,7 +142,7 @@ outright, with the training loss pinned at ln 2 = 0.6931 at one or more
 checkpoints: a 16-hop signal under mean aggregation on a degree-2 path is
 attenuated by about 2^-16, so there is no gradient to learn from.
 
-Figure: `runs/topology/reach-task.png`.
+![R2: AUC per layout and substrate](img/topology-reach.png)
 
 ## Caveats
 
