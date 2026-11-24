@@ -1,0 +1,257 @@
+{
+  "envelope": {
+    "params": 385120,
+    "size_mb_fp32": 1.54048,
+    "bytes_per_s_1thread": 65.1711076946163,
+    "heldout_bpb": 2.4776586151365776,
+    "heldout_bytes": 168960,
+    "eval_seconds": 33.42474699020386
+  },
+  "code": {
+    "model": {
+      "dim": 96,
+      "depth": 3,
+      "heads": 4,
+      "ctx": 256,
+      "pos": "rope",
+      "steps": 1200
+    },
+    "heldout_bpb": 2.4776586151365776,
+    "generation": {
+      "prompts": 4,
+      "bytes_each": 96,
+      "bytes_per_s": 65.1711076946163,
+      "compile_rate": 0.0625,
+      "compiled": 1,
+      "n": 16
+    },
+    "bigram": {
+      "heldout_bpb": 6.211302757263184,
+      "compile_rate": 0.0,
+      "compiled": 0,
+      "n": 12
+    },
+    "samples": [
+      {
+        "mode": "greedy",
+        "seed": 0,
+        "prompt": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    ",
+        "generated": "                                                                                                ",
+        "compiles": false
+      },
+      {
+        "mode": "greedy",
+        "seed": 0,
+        "prompt": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        ",
+        "generated": "                                                                                                ",
+        "compiles": false
+      },
+      {
+        "mode": "greedy",
+        "seed": 0,
+        "prompt": "def fib(n):\n    if n < 2:\n        return n\n    return ",
+        "generated": "is the self._code(self, self.___________________________________________________________________",
+        "compiles": false
+      },
+      {
+        "mode": "greedy",
+        "seed": 0,
+        "prompt": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return ",
+        "generated": "= '                                                                                             ",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 0,
+        "prompt": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    ",
+        "generated": "        return while che onters tyto lib bock\n    def __sep_tip_file()\n                      # b",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 0,
+        "prompt": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        ",
+        "generated": "self._ded__adin_confies peced(\") for is to did it mest becels on at in path math in conte(iname,",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 0,
+        "prompt": "def fib(n):\n    if n < 2:\n        return n\n    return ",
+        "generated": "_semt__S_purt = __frefad((delf, mouding = None, (labile, ', 'r', ' d', ':'k'', '\"'_'< = '' with ",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 0,
+        "prompt": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return ",
+        "generated": "              # 0x00087: 0x00060.3,     #  0x002,     #  LATIN SMALL LETTER O WITH ACE\n    0x005",
+        "compiles": true
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 1,
+        "prompt": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    ",
+        "generated": "    if return net = '\n    if for sulf._depoding()\n\n        sthir = self.__demaderents is is val ",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 1,
+        "prompt": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        ",
+        "generated": "    \"\"\"\n                                                                                        ",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 1,
+        "prompt": "def fib(n):\n    if n < 2:\n        return n\n    return ",
+        "generated": "self.clage(okesed = ', inpers' trip onctstaller omp comport cos cot.\"ONTAPOTAN\n        self._ale",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 1,
+        "prompt": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return ",
+        "generated": "othe fale is string\n\n                self.pretarse(defarr, endeang_wiple_self.___self._sstar()\n ",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 2,
+        "prompt": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    ",
+        "generated": "def _ding_sizer__setate__tomade = deffty):\n                \"\"\"\"\"\n            return self._ing(se",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 2,
+        "prompt": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        ",
+        "generated": "    self.nchar_pant_doot(iread)\n        if ising = self._writor cosparce timpirt=imper(for, \"\")\n",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 2,
+        "prompt": "def fib(n):\n    if n < 2:\n        return n\n    return ",
+        "generated": "Malig pavate\n        if enclame = self.riget(f):\n                                              #",
+        "compiles": false
+      },
+      {
+        "mode": "sample t=0.8 top-p 0.95",
+        "seed": 2,
+        "prompt": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return ",
+        "generated": "colde(self, b'b' \"'s' bit a self.alsing_top()\n                          self.___toulinding = rea",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 0,
+        "prompt": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    ",
+        "generated": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    :\ufffds\ufffd4\ufffdAG\ufffd\ufffd\ufffd$I(\u0005\ufffd\ufffd]\ufffd\ufffdH\ufffd% o\ufffd0 \u001d\ufffd\u0014 `{NN\ufffdls\u0013\ufffd\ufffdQdqt\ufffdz\ufffd\ufffd'\ufffdKn\u001c\ufffdR\u0014\ufffd \ufffd'\ufffd\u0013\ufffd 0\ufffd\u0014\ufffd30n\ufffd\ufffd\ufffd\ufffd\ufffd 4\ufffd\ufffddT\ufffdd\u000b_ :\ufffd;=\ufffd#",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 0,
+        "prompt": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        ",
+        "generated": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        e\ufffd\ufffd\ufffd\u0007\ufffd[l \ufffd_  \u00032e\n\u059d5\ufffd9U\ufffd  w\ufffdw\ufffd\ufffdkQr\ufffd\u0005\ufffdoAaya7U@\u0019\ufffd\ufffdw\t\ufffd\ufffdT\ufffd\u0405 0]\ufffdE\ufffd\ufffdD4\u0001\ufffd\ufffd\ufffdox\t\ufffd\ufffdd\ufffd\ufffd\ufffd\u0014O\ufffde \"nmw\ufffd\ufffd\u0015zN\ufffd  {",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 0,
+        "prompt": "def fib(n):\n    if n < 2:\n        return n\n    return ",
+        "generated": "def fib(n):\n    if n < 2:\n        return n\n    return i=\ufffdb\ufffd\ufffd+ '\ufffd!\ufffd#\ufffd\ufffd,\ufffd\ufffd@\ufffdB\ufffd\ufffd>h\u000f\ufffdP\ufffd\ufffd6\ufffd\ufffdtMRf<\ufffd\\\ufffd\u0001 \u0017\ufffd\u025d!ad\u0000\" \ufffd\u0019f\u0018\n\u067db \ufffd\ufffd\ufffdd\u0018\ufffdak\ufffd8Fn: \ufffd\ufffd\ufffd\ufffdf\u0005\ufffd\ufffd\u039a\ufffd\u0017rg\u001eE\ufffd \ufffd",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 0,
+        "prompt": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return ",
+        "generated": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return P\u0018\ufffd \ufffd \u0016W\ufffd0EUf\u007f\ufffds >\u0234  1\u0016\ufffd.\ufffd/ew t\ufffd\u001b\"(t\ufffd\ufffd\ufffdoZpkAN\u0146\ufffd0\ufffde\u007f\n \u001f\u001b\ufffdp?_\ufffd?P\u05b4l=(\u001et?^\n \ufffdZ\ufffd\u001c\u000b\ufffd\ufffd\ufffd\u000beO\ufffdn]\ufffdp\t\ufffdVh&",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 1,
+        "prompt": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    ",
+        "generated": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    \ufffd\ufffdem\ufffd[ LFm0 T/\ufffd \ufffd\u0006\u07cat\ufffd\ufffdA\ufffd\u0492\ufffdnA\ufffdg\ufffd4\ufffd\u001f\u0015 \u001cL\ufffd\ufffd\ufffdx \u0013\u0191 s\ufffd\u0002?@ \u001ae9\ufffd\ufffdf\ufffd\ufffd\ufffd:!\ufffd\ufffdL7\ufffd ' ri R\ufffd\ufffd%\ufffd \ufffd\ufffdL\ufffd.\b5m\ufffdt",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 1,
+        "prompt": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        ",
+        "generated": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        \ufffd\ufffd \ufffd\u06d2\ufffd\ufffd^\ufffd \ufffd\ufffdF\ufffdn\ufffdJ\ufffdu\ufffd\ufffdd\ufffdE\u0004r \ufffd\ufffd\ufffd\" \ufffd|\ufffd\ufffdQ\u001c\ufffdOB\ufffd\ufffdK\ufffd\ufffdl{\ufffdx\ufffdr\ufffd\ufffdr\ufffd\u0294 c}\u03e2\ufffd;9\ufffd K\ufffd\ufffd_p\u0007\ufffd\ufffdbCsa Yl\ufffd'\ufffdu)\ufffdi4\\BF",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 1,
+        "prompt": "def fib(n):\n    if n < 2:\n        return n\n    return ",
+        "generated": "def fib(n):\n    if n < 2:\n        return n\n    return \ufffd\ufffd\ufffd\ufffdB\ufffd ,8\ufffd\ufffde{\ufffd\ufffd\ufffd\"r\\\ufffd E\u0000u \ufffd\u001a\ufffd\ufffd\"_Cre\ufffdMZ\ufffdO\ufffd\ufffd\ufffdR\" sOo\\ \"E\ufffd\ufffd_\u000f\ufffddZ.V\u001b\ufffd71\ufffdi\ufffd\ufffd;Ttod\u0166\ufffd\f\ufffd\ufffd Q\u0014R\ufffd<\u0001Mr\ufffd\ufffd\ufffd\ufffd",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 1,
+        "prompt": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return ",
+        "generated": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return \u001bI\ufffd\ufffd\ufffdB*\ufffd e\u0015 \ufffd\u02a4\u0297 so\ufffd \ufffd\ufffd)?\ufffd\ufffd(vw\ufffd !s\ufffdi\ufffdN{\ufffd\u001f\u027e\ufffd\ufffd\ufffd0\ufffd;!>\ufffd \ufffd\ufffdP\ufffd\ufffde\ufffd\ufffd\ufffd\ufffdek\u0007\uc79bH\ufffd\ufffd\r\ufffd\ufffd \ufffdV\u0006\ufffdQ\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u0013hp\ufffd\ufffde",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 2,
+        "prompt": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    ",
+        "generated": "def mean(xs):\n    return sum(xs) / len(xs)\n\n\ndef median(xs):\n    k\ufffd\ufffd\n\ufffd1~i{La\ufffd!\u0147B\ufffdV\ufffdt\ufffd|\ufffd\tl?\ufffd\u001au:\ufffd0\u0001\feS\u001d \u0015 K ~]\u0005\u000b\ufffd\ufffd\u0013\ufffdw\u000b\ufffd\f\u0014t\u000ftZBs\ufffd\ufffd\ufffd`\ufffdLe\ufffdrH  \ufffd\ufffdh\ufffd\ufffd\ufffdn_\ufffd\ufffd\ufffd\ufffd\ufffd\u0010\ufffd\u001c  $\ufffdn",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 2,
+        "prompt": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        ",
+        "generated": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        9m\ufffd\ufffd\u001b\ufffdMO\ufffd(s\ufffdg\ufffd#S\u0003\ufffd\ufffd>;\ufffdH\ufffd_\ufffd\ufffdJi\ufffde \ufffd\ufffd\ufffd\ufffdtg=\ufffd\u0003{\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffde\u0017lt\ufffd\u007f\ufffda\ufffd\ufffd\ufffdZ \u001c\ufffdb\ufffdIA\u0019\ufffd\ufffd\u001cm\ufffd\ufffd3 $\ufffd rQ\ufffd\ufffd \ufffdi1\ufffd l\ufffdN ",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 2,
+        "prompt": "def fib(n):\n    if n < 2:\n        return n\n    return ",
+        "generated": "def fib(n):\n    if n < 2:\n        return n\n    return s \ufffd\u001b\ufffdJ\ufffd\u0000\" \ufffdrhd\ufffd\u001b-t-\ufffd\ufffd$\ff\ufffdt\ufffd\ufffd\ufffd\ufffd;Y\u053fb6\ufffd\ufffd\ufffd\ufffd\ufffd.\ufffd\ufffd d\u0271\ufffd\ufffd\u001cN\u0007\u06f4\ufffdh\u0002\ufffd\u02ff\u0014E\u001b\ufffd\ufffd,h\ufffd\\\ufffd_\ufffd\ufffd,c}V\ufffd\ufffd\u001f\ufffd\ufffdx\ufffdj\u0005\t\ufffd4\ufffd\ufffd|)@",
+        "compiles": false
+      },
+      {
+        "mode": "bigram",
+        "seed": 2,
+        "prompt": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return ",
+        "generated": "import math\n\n\ndef norm(v):\n    total = 0.0\n    for x in v:\n        total += x * x\n    return \ufffd'S\u00020\ufffd_c2\ufffd\ufffd\u001dx\ufffd\u0015J\u000fvr\ufffd\ufffdB\ufffd\ufffd\ufffd\ufffd\u04bde\",g\ufffd\fq:\ufffd\ufffd\ufffd\u001d\ufffdFl D\u001ao\u001a\u000bf'\ufffd\ufffd\ufffdvq\ufffd8\ufffdk\ufffd  \ufffds \u03f5\ufffd\ufffd\ufffd\ufffdwnRBe\u000e\ufffd\ufffd\ufffd\u0019Il b8\ufffd8M\ufffd  \ufffd",
+        "compiles": false
+      }
+    ]
+  },
+  "image": {
+    "checkpoint": "runs/main-hex",
+    "drawing": "drawings/hex-tessellation.jpg",
+    "nodes": 203,
+    "params": 405342,
+    "forward_ms": 133.15234184265137,
+    "passes": 8,
+    "fill_seconds": 1.0234065055847168,
+    "fill": {
+      "mse": 0.1575799137353897,
+      "r": 0.3600122928619385
+    },
+    "completion": {
+      "cells": 25,
+      "mse": 0.002449765568599105,
+      "r": 0.9056612253189087,
+      "seconds": 0.1276237964630127
+    },
+    "constant": {
+      "mse": 0.16870488226413727,
+      "r": 0.2868703603744507
+    },
+    "one_pass_ms_projected": 1.065218734741211
+  }
+}

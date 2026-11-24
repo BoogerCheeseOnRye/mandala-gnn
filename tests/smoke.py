@@ -149,6 +149,15 @@ def main() -> None:
     check(0.0 <= oracle_score(samples)["pairwise"] <= 1.0,
           "selector: the visibility oracle scores in range")
 
+    # meter: the compile check has to accept real code and reject broken code
+    from tools.gen_meter import compiles
+    check(compiles(b"def f(x):\n    return x + 1\n"),
+          "meter: a valid function compiles")
+    check(not compiles(b"def f(x)\n    return 1\n"),
+          "meter: a broken signature does not compile")
+    check(not compiles(b"def f(x):\n    return +\n"),
+          "meter: a dangling operator does not compile")
+
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,
                      depth=2, blocks=1)

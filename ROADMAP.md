@@ -384,6 +384,104 @@ made to rank quality at fixed input it memorises masks instead. The one thing
 it can do that a count cannot is rank which subset of a fixed-size observation
 was more informative — and that is not the problem a search loop has.
 
+## Images and code generation: ten steps, small and fast
+
+Two artifacts exist and both are small: the 405 k GNN reconstructs the three
+drawings at r 0.906 / 0.742 / 0.936, and the 385 k byte-level transformer writes
+Python at 2.48 bits/byte on files it never saw. The target is one model that
+does both, under a stated envelope: **≤ 5 M parameters, ≤ 25 MB int8, ≥ 1 kB/s
+generation on this phone, ≤ 2 s to finish a drawing**. Every step below has a
+gate and a kill, and every number comes from `tools/` on this device.
+
+1. **The meter (done, `runs/budget/results.json`).** One script reports params,
+   MB, bytes/s, held-out bits/byte and compile rate for code, and per-pass cost
+   plus a progressive-fill image, for the drawing model. References: the R1
+   RoPE byte model retrained and saved, an order-2 byte n-gram floor, and the
+   hex GNN's eight-pass fill against a constant-image floor. Later steps are
+   scored only against this table. *Gate: the table exists and is reproducible
+   with one command.*
+2. **Evaluation sets of record.** 40 held-out Python functions with a
+   docstring + unit test each, and 12 held-out drawings per layout, frozen by
+   SHA in `runs/budget/eval.json`. *Gate: no file in either set appears in
+   training; the SHA is checked by the meter.* *Kill: none — without this,
+   steps 3–8 are unfalsifiable.*
+3. **The code model under a fixed 20-minute CPU budget.** Sweep dim 96/128/192
+   and depth 3/6/9 at ~0.4 M and ~1.5 M parameters, same corpus, two seeds;
+   report bits/byte **and** compile rate. Pick on compile rate first. *Gate:
+   compile rate beats the n-gram floor by ≥ 10 points.* *Kill: no arm beats
+   the floor — then the byte model is a completion toy, not a code model, and
+   the conditional step is dropped.*
+4. **Fast sampling.** The current loop recomputes the whole window per byte;
+   add a KV cache and torch int8 dynamic quantization, measure bytes/s and the
+   bits/byte cost. *Gate: ≥ 1 kB/s single-thread at ≤ 1% bits/byte regression,
+   ≤ 25 MB on disk.* *Kill: quantization costs > 3% — then keep fp32 and shrink
+   the model instead.*
+5. **Conditional code.** Fine-tune on (docstring, function, test) triples from
+   the training files only; measure pass@1 on step 2's tests, greedy and
+   temperature 0.8. *Gate: pass@1 > 0 on ≥ 5 of 40, and above a
+   "copy the longest training function" control.* *Kill: pass@1 = 0 — the
+   model stays a completion model and step 9 becomes "complete this line".*
+6. **The drawing generator.** Two candidates on the same held-out drawings:
+   the GNN's masked-fill loop (8 and 16 passes), and an AR patch-token
+   decoder at matched parameters. Score masked MSE, r, and seconds per
+   drawing against the constant-image floor. *Gate: beats the floor by 2× MSE
+   and finishes in ≤ 2 s.* *Kill: both at the floor — then "images" means
+   reconstruction, not generation, and the page says so.*
+7. **One trunk, two alphabets.** A single decoder-only transformer with a byte
+   embedding and a patch embedding, geometry bias only in the patch attention
+   (R0's lesson: geometry is a query prior). Matched-parameter control: the
+   same code model and image model trained separately, same total parameters
+   and tokens. *Gate: the shared trunk is within 3% bits/byte and 10% image
+   MSE of the two-model control; otherwise the sharing is not free and gets
+   dropped.*
+8. **Transfer, pre-registered.** Image-pretrain then code-fine-tune, and the
+   reverse, at fixed tokens and parameters, two seeds. Bar: ≥ 2% bits/byte or
+   ≥ 5 points compile rate. *Kill: both transfers inside seed noise — publish
+   the null and stop selling "multimodal".*
+9. **Conditioning without a chat stack.** Twelve fixed commands split across
+   the two skills ("draw the hub chart", "write a function that returns the
+   mean of a list"), a documented prompt format, and success measured per
+   command. *Gate: ≥ 8/12 correct.* *Kill: ≤ 4/12 — ship completion-only.*
+10. **Ship and decide.** int8 weights ≤ 25 MB, on-device timing, a page with
+    samples, the meter table, and the failures. If steps 5 and 6 stay at their
+    floors, keep the meter and the negative result, and stop — the point of
+    the ten steps is to make that decision with numbers, not to keep the
+    branch alive.
+
+The cheapest useful thing to build first is the meter: every later claim is a
+delta against it, and it costs one training run and one afternoon.
+
+### Step 1, measured
+
+`tools/gen_meter.py --out runs/budget` (one command; checkpoint saved to
+`runs/budget/code-rope.pt`, samples in `runs/budget/samples.txt`).
+
+| what | code | image (hex) |
+|---|---|---|
+| parameters / fp32 size | 385,120 / 1.54 MB | 405,342 / 1.62 MB |
+| held-out quality | **2.478 bits/byte** (R1's 2.478, reproduced) | wedge r **0.906** at 130 ms (published 0.906) |
+| generation speed, 1 thread | **65–83 B/s** (96 bytes, 4 prompts) | **133 ms** per forward |
+| generated output | **1 of 16 samples compiles** (6.2%); order-2 byte floor 6.211 b/B, 0 of 12 compile | 8-pass fill from nothing: **1.0 s**, r **0.360** |
+| floor | n-gram, no learning | constant image: r 0.287, MSE 0.169 |
+
+Three things the meter already says, before any new model:
+
+* **The code model is real but slow.** 2.478 bits/byte is the R1 number
+  reproduced exactly, and a generated continuation compiles — but one sample
+  in sixteen, and 65–83 B/s is 12–15× below the ≥ 1 kB/s gate. Both are fixable
+  (step 4's KV cache; step 3's budget), and neither is fixed yet.
+* **Greedy decoding is degenerate at this size.** The four greedy samples run
+  into repeated spaces and `self._code(self, self.____`; sampled output at
+  temperature 0.8 is the one that compiles. Later steps report greedy and
+  sampled separately, because averaging them hides that.
+* **The drawing model cannot generate from nothing.** Its eight-pass fill
+  lands at r 0.360, against 0.287 for a constant image and 0.906 for the same
+  checkpoint's wedge completion — about a tenth of the way from a blank image
+  to its own conditional answer. The checkpoint is a reconstructor; a
+  generation claim has to be earned with a schedule it was trained for, or
+  with a different decoder (step 6). This is the most important row in the
+  table.
+
 ## Non-goals, stated once
 
 * No OGB/LRGB leaderboard runs. A 405 k model will not be competitive there,

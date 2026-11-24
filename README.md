@@ -240,6 +240,14 @@ states -- not the direction this repo is on. Topology is untouched by the
 result. Write-up and figures:
 **[docs/energy.html](https://boogercheeseonrye.github.io/mandala-gnn/energy.html)**.
 
+The next branch is images *and* code in one small model, and its ten-step plan
+(with kill criteria) is in [ROADMAP.md](ROADMAP.md#images-and-code-generation-ten-steps-small-and-fast).
+Step 1 is measured: the 385 k byte model reproduces R1 at 2.478 bits/byte and
+generates at 65-83 B/s single-thread (1 of 16 continuations compiles), while
+the 405 k GNN completes a held-out wedge at r 0.906 but only reaches r 0.360
+when asked to draw from an empty canvas, against 0.287 for a constant image.
+Those are the numbers later steps have to beat.
+
 ## What this is not
 
 No claim of a new architecture. The pieces -- message passing, RBF edge
