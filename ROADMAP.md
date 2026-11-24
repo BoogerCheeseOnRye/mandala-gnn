@@ -317,14 +317,72 @@ version is possible here: let a proposer emit variants of the bias (harmonics,
 edge set, gate shape) and score them on the R0/R2 harness. That is a useful
 tool; it is not self-improvement, and it should not be described as such.
 
-## Energy's job from here
+## Energy's last job: the selector, measured
 
-Not a landscape, not a loss. A **selector**: given K sampled completions of the
-same mask, pick the one with the lowest true error. The current head cannot do
-that because it was trained to rank *how much was seen*, not *how right the
-answer is*. The next honest energy experiment is 200 pairs of completions of
-the same mask, labelled by true error, and a held-out reranking accuracy
-against random choice. Until that runs, the energy page says what it says.
+Not a landscape, not a loss. A **selector**: given K completions, pick the one
+with the lowest true error. That was the last open claim, and it is measured
+now in four candidate regimes, on all three drawings (`tools/energy_selector.py`,
+`runs/energy-selector/results.json`, about 20 minutes of CPU).
+
+**Protocol.** 60 training masks and 40 held-out masks plus the wedge, per
+drawing, at ratios 0.15–0.35 of the visible cells — none of them in the
+visibility bank the old head was trained on. K = 8 candidates per mask. Labels
+are the masked MSE of the decoded patches, so they never touch the head's
+input. Three heads are scored on identical candidates: the published
+visibility head, a head trained with a pairwise hinge on the true ordering, and
+the same head trained on the *opposite* ordering. The inverted head is the
+control that matters: it has to land below chance wherever the labels are
+learnable, or the loop is not learning anything.
+
+Held-out pairwise accuracy, chance 0.5 (`quality` head unless marked):
+
+| candidates | what differs | hex | mandala | chart | error spread |
+|---|---|---|---|---|---|
+| same mask, fixed temperature (σ 1.0 / 2.0) | noise realisation only | 0.463 / 0.475 | 0.447 / 0.553 | 0.514 / 0.539 | 20–37 / 13–28 / 20–48% |
+| **same input, K dropout samples** | the model's own noise | **0.500** | **0.505** | **0.507** | 40 / 8 / 76% |
+| same target mask, same number visible | which cells were seen | 0.671 | 0.506 | 0.681 | 41 / 5 / 3% |
+| same target mask, different amounts visible | how many cells were seen | 0.807 | 0.649 | 0.562 | 46 / 5 / 2% |
+| *neighbour smoothness*, swap family (no learning) | — | 0.628 | 0.499 | 0.603 | — |
+| *count of visible cells* (no learning) | — | 0.794 | 0.642 | 0.525 | — |
+| *inverted labels*, same-mask sampler | — | 0.473 | 0.461 | 0.462 | — |
+
+**Verdict: closed as a reranker, with one capability worth naming.**
+
+* **On the case a reranker actually faces — K samples of the same input — the
+  head is at chance on all three drawings**: 0.500, 0.505, 0.507, against
+  training-mask scores of 0.598–0.613. Pooled over drawings the sampler family
+  is 0.504 ± 0.014 (123 mask-cells) and the fixed-temperature family is
+  0.498 ± 0.009 (246): at chance, with the interval excluding any useful
+  reranking. So it learns something that does not transfer, every time, at
+  every temperature. A neighbour-smoothness statistic
+  with no parameters and no training beats it on the hex drawing (0.598, ahead
+  by 0.097, paired t = 2.7) and the chart (0.590, ahead by 0.083, t = 2.2); it
+  loses on the mandala (0.451).
+* **Where it does order above chance, it is the setting a reranker never has.**
+  Given candidates that each hid a different random subset of the *same number*
+  of cells, it reaches 0.671 on hex and 0.681 on the chart, and on hex its pick
+  is 5.6% better than an average candidate (37% of the available improvement).
+  That is "which observation was better", not "which sample is better": you do
+  not sample different subsets of your own input and ask the head to choose.
+* **Where the candidates differ in how much they saw, it reproduces a count.**
+  0.807 against the count's 0.794 on hex (+0.014 ± 0.005), 0.649/0.642 on the
+  mandala, 0.562/0.525 on the chart. Nothing a head gives you that counting
+  visible cells does not.
+* **The mandala is uninformative in two of the four families**: its candidates
+  differ by 5–8% in error, so there is almost nothing to rank there. That is a
+  property of the drawing, not of the head, and it is why every claim here is
+  reported per drawing.
+
+The earlier visibility result (24/24, 19/24, 14/24) was underpowered on the
+small graphs rather than wrong: with 40 masks × 28 pairs the visibility-trained
+head ranks by amount-seen at 0.781/0.556/0.506. It still adds nothing over the
+count.
+
+So the search loop stays closed, and the reason is now precise: the head's
+signal is about *how much was seen*, which you already know, and when it is
+made to rank quality at fixed input it memorises masks instead. The one thing
+it can do that a count cannot is rank which subset of a fixed-size observation
+was more informative — and that is not the problem a search loop has.
 
 ## Non-goals, stated once
 

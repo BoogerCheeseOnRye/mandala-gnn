@@ -105,8 +105,8 @@ because with no edges and no pooling every hidden cell has identical input.
 
 ## Do the drawings carry beyond reconstruction?
 
-Two follow-up experiments, both negative. Designs, costs and kill criteria are in
-`ROADMAP.md`; the raw numbers are in the JSON next to each run.
+Three follow-up experiments, all negative. Designs, costs and kill criteria are
+in `ROADMAP.md`; the raw numbers are in the JSON next to each run.
 
 **R0 — geometry as a sequence prior** (`runs/seq/results.json`). Six matched
 causal transformers over scanline-ordered patch codes of synthetic renders of
@@ -174,6 +174,72 @@ checkpoints: a 16-hop signal under mean aggregation on a degree-2 path is
 attenuated by about 2^-16, so there is no gradient to learn from.
 
 ![R2: AUC per layout and substrate](img/topology-reach.png)
+
+**S — the energy head as a reranker** (`runs/energy-selector/results.json`).
+The energy head's last surviving job was selection: given K completions, pick
+the one closest to the truth. It was trained for a different question — tell a
+state that saw most of the drawing from one that saw little — and does that
+perfectly. S asks the selection question in four candidate regimes, on all
+three drawings, with 60 training and 40 held-out masks per drawing (41 scored, including
+the wedge), K = 8, and 0.15–0.35 of the cells visible. Labels are the masked MSE
+of the decoded patches, so they never touch the head's input. Three heads are
+scored on identical candidates: the published visibility head, a head trained
+with a pairwise hinge on the true ordering, and the same head trained on the
+*opposite* ordering (a learnability control — it must land below chance
+wherever a signal exists). Two non-learned controls are scored alongside: pick
+the candidate that saw the most cells, and a one-line neighbour-smoothness
+prior.
+
+Held-out pairwise accuracy over 41 masks x 28 pairs, chance 0.5, `quality` head
+unless marked:
+
+| candidates | what differs between them | hex | mandala | chart | error spread |
+|---|---|---|---|---|---|
+| same mask, fixed temperature (σ 1.0 / 2.0) | noise realisation only | 0.463 / 0.475 | 0.447 / 0.553 | 0.514 / 0.539 | 20–37 / 13–28 / 20–48% |
+| **same input, K dropout samples** | the model's own noise | **0.500** | **0.505** | **0.507** | 40 / 8 / 76% |
+| same target mask, same number visible | which cells were seen | 0.671 | 0.506 | 0.681 | 41 / 5 / 3% |
+| same target mask, different amounts visible | how many cells were seen | 0.807 | 0.649 | 0.562 | 46 / 5 / 2% |
+| *neighbour smoothness*, swap family (no learning) | — | 0.628 | 0.499 | 0.603 | — |
+| *count of visible cells* (no learning) | — | 0.794 | 0.642 | 0.525 | — |
+| *inverted labels*, sampler family | — | 0.473 | 0.461 | 0.462 | — |
+
+* **On the regime a reranker actually faces — K samples of the same input — the
+  head is at chance on all three drawings**: 0.500, 0.505, 0.507, while fitting
+  its training masks at 0.598–0.613. Pooled: 0.504 ± 0.014 over 123 mask-cells
+  for the sampler, 0.498 ± 0.009 over 246 for the fixed-temperature family.
+  At every temperature, on every drawing, it learns something that does not
+  transfer.
+* **A parameter-free smoothness prior beats it where there is spread.** On the
+  hex drawing the head captures none of the available gain while the
+  neighbour-smoothness statistic reaches 0.598 pairwise and 27% of the gain,
+  ahead of the head by 0.097 (paired t = 2.7); on the chart it is 0.590, ahead
+  by 0.083 (t = 2.2). It loses on the mandala (0.451), whose sampler candidates
+  differ by only 8% in error.
+* **Where it does order above chance, it is a setting a reranker never has.**
+  With candidates that each hid a different random subset of the *same number*
+  of cells, it reaches 0.671 on hex and 0.681 on the chart; on hex its pick is
+  5.6% better than an average candidate, 37% of the available gain. That is
+  "which observation was better", not "which sample is better".
+* **Where candidates differ in how much they saw, it reproduces a count.**
+  0.807 against the count's 0.794 on hex (+0.014 ± 0.005, t = 2.9), 0.649/0.642
+  on the mandala, 0.562/0.525 on the chart. Nothing a head gives you that
+  counting visible cells does not.
+* **The controls say the loop can learn labels at all.** With the true ordering
+  the head reaches 0.671 on hex swap; with the ordering flipped it falls to
+  0.345 (2 of 41 masks above chance) and to 0.201 on the context family. On the
+  sampler family the inverted head sits at chance too (0.473/0.461/0.462), which
+  is the same statement: there is nothing there to invert.
+* **The mandala is uninformative in two of four families** — 5–8% candidate
+  spread, so almost nothing to rank. That is the drawing, not the head, and it
+  is why every claim above is per drawing.
+
+So the search loop stays closed, for a precise reason: the head's signal is
+about *how much was seen*, which the caller already knows, and when it is made
+to rank quality at fixed input it memorises masks instead. The one thing it can
+do that a count cannot — rank which fixed-size subset of an observation was
+more informative — is not the problem a search loop has.
+
+![S: pairwise accuracy per candidate family, and what the head captures of the available gain](img/energy-selector.png)
 
 ## Caveats
 

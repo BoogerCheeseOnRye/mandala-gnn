@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#07080c">
 <title>Mandala-GNN — the energy head, on three drawings</title>
-<meta name="description" content="A 6,946-parameter energy head over a frozen GNN, tested on all three hand drawings (203, 61 and 25 nodes): descent does not improve the redraw on any of them.">
+<meta name="description" content="A 6,946-parameter energy head over a frozen GNN, tested on all three hand drawings (203, 61 and 25 nodes): descent does not improve the redraw, and reranking eight samples is at chance on all three.">
 <meta property="og:title" content="Mandala-GNN — the energy head">
-<meta property="og:description" content="Freeze the backbone, learn E(h), descend it to improve a redraw. Three drawings, 64 s each, and the same answer on all three.">
+<meta property="og:description" content="Freeze the backbone, learn E(h), descend it to improve a redraw. Three drawings, 64 s each, no descent gain — and at chance as a reranker of eight samples.">
 <meta property="og:image" content="img/energy-replication.png">
 <link rel="stylesheet" href="site.css">
 </head>
@@ -38,7 +38,11 @@
     hidden states? Freeze the 405k-parameter backbone, fit a small
     <span class="mono">E(h)</span> on top, descend it on the hidden cells. The head costs
     6,946 parameters and a minute per drawing. Run on all three drawings in the repo —
-    203, 61 and 25 nodes — descent improves the redraw on none of them.
+    203, 61 and 25 nodes — descent improves the redraw on none of them. Its last surviving
+    job was to <em>rerank</em>: given eight completions, pick the one closest to the truth.
+    That is measured on the same three drawings further down, with disjoint training and
+    held-out masks, and it is at chance on all three in the only regime a reranker actually
+    meets.
   </p>
 
   <div class="stats">
@@ -46,6 +50,7 @@
     <div><b>3</b><span>drawings tested</span></div>
     <div><b>0 / 3</b><span>descent gains</span></div>
     <div><b>±0.4%</b><span>E(true) vs E(guess)</span></div>
+    <div><b>0.50</b><span>held-out reranking</span></div>
     <div><b>64 s</b><span>per drawing</span></div>
   </div>
 </section>
@@ -229,11 +234,104 @@
   </div>
 </section>
 
+<section class="band" id="selector">
+  <h2>The selector, measured</h2>
+  <p class="sub">Given eight completions, pick the one closest to the truth. Four candidate
+    regimes, on all three drawings, with 60 training masks and 40 held-out masks per drawing
+    — none of them in the bank the head was trained on.</p>
+
+  <p>
+    K = 8 candidates per mask, 0.15–0.35 of the cells visible, labels are the masked MSE of
+    the <em>decoded patches</em>, so they never enter the head's input. Three heads are scored
+    on identical candidates: the published visibility head, a head trained with a pairwise
+    hinge on the true ordering, and the same head trained on the inverted ordering. The
+    inverted head is the learnability control — wherever there is a signal to learn, it has
+    to fall below chance. Two controls with no training at all are scored alongside: pick the
+    candidate that saw the most cells, and a one-line neighbour-smoothness prior.
+  </p>
+
+  <div class="table-wrap prose">
+    <table>
+      <thead><tr><th>Candidate family</th><th>What differs between candidates</th><th>Held-out pairwise · hex / mandala / chart</th><th>Error spread</th></tr></thead>
+      <tbody>
+        <tr><td>same mask, fixed temperature, σ 1.0</td><td>noise realisation only</td><td>0.463 / 0.447 / 0.514</td><td>20 / 13 / 20%</td></tr>
+        <tr><td>same mask, fixed temperature, σ 2.0</td><td>noise realisation only</td><td>0.475 / 0.553 / 0.539</td><td>37 / 28 / 48%</td></tr>
+        <tr class="hl"><td><b>same input, 8 dropout samples</b></td><td><b>the model's own noise</b></td><td><b>0.500 / 0.505 / 0.507</b></td><td>40 / 8 / 76%</td></tr>
+        <tr><td>same mask, same number of visible cells</td><td>which cells were seen</td><td>0.671 / 0.506 / 0.681</td><td>41 / 5 / 3%</td></tr>
+        <tr><td>same mask, different amounts visible</td><td>how many cells were seen</td><td>0.807 / 0.649 / 0.562</td><td>46 / 5 / 2%</td></tr>
+        <tr><td>neighbour smoothness <span class="mono">(no learning)</span></td><td>—</td><td>0.628 / 0.499 / 0.603</td><td>—</td></tr>
+        <tr><td>count of visible cells <span class="mono">(no learning)</span></td><td>—</td><td>0.794 / 0.642 / 0.525</td><td>—</td></tr>
+        <tr><td>inverted labels, sampler family</td><td>—</td><td>0.473 / 0.461 / 0.462</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="caption">
+    Chance is 0.500; each cell is 41 held-out masks (40 plus the wedge) × 28 within-mask
+    pairs, and the quoted intervals are over masks. The quality head
+    unless marked otherwise. Error spread is the min-to-max error range of the eight
+    candidates on a typical mask — the room a perfect reranker has.
+  </p>
+
+  <div class="note-grid">
+    <article class="note bad">
+      <div class="tag">the case that matters</div>
+      <h3>At chance on the real sampler</h3>
+      <p>Eight stochastic passes of the same masked drawing: 0.500, 0.505, 0.507, against
+      0.598–0.613 on its own training masks. Pooled, 0.504 ± 0.014 over 123 mask-cells. The
+      no-learning smoothness prior beats it on hex (0.598, ahead by 0.10, paired t = 2.7) and
+      on the chart (0.590, ahead by 0.08, t = 2.2), and captures 27% of the available gain on
+      hex against the head's none. On the mandala the candidates differ by 8% in error, so there is nothing to
+      rerank.</p>
+    </article>
+    <article class="note warn">
+      <div class="tag">where it does work</div>
+      <h3>It counts visible cells</h3>
+      <p>When candidates differ in how much they saw, it reaches 0.807 on hex against the
+      count's 0.794 (+0.014 ± 0.005, t = 2.9), 0.649 against 0.642 on the mandala, 0.562
+      against 0.525 on the chart. That is the published visibility signal, and it is
+      information the caller already has.</p>
+    </article>
+    <article class="note">
+      <div class="tag">real, but not a reranker</div>
+      <h3>Which subset was seen</h3>
+      <p>When every candidate sees the <em>same number</em> of cells but a different random
+      subset, the head orders quality at 0.671 on hex and 0.681 on the chart, and its top pick
+      is 5.6% better than an average candidate on hex — 37% of the available gain. The
+      inverted-label head falls to 0.345 on the same pairs, so this is learned, not an
+      artefact. It is also not a situation a search loop is in.</p>
+    </article>
+  </div>
+
+  <figure class="shot">
+    <img src="img/energy-selector.png" alt="Four panels, one per candidate regime, with bars giving held-out pairwise accuracy for three trained heads and the no-learning controls, grouped by drawing; chance is a horizontal line and every panel stays close to it in the sampler regime.">
+    <figcaption>
+      One panel per candidate regime, top to bottom: fixed temperature (lighter bar σ 1.0,
+      darker σ 2.0), different amounts visible, same number visible with different subsets,
+      and the dropout sampler. Bars are held-out pairwise accuracy for the visibility-trained
+      head (blue), the quality-trained head (green), the inverted-label control (red), the
+      no-learning smoothness prior (olive) and, where the question is defined, the count of
+      visible cells (orange). The line is chance at 0.5; the small print under each drawing is
+      that family's candidate error spread — the room a perfect reranker would have. In the
+      bottom panel, the case a reranker actually faces, all three trained heads sit on the
+      line while the smoothness prior climbs above it on two drawings.
+    </figcaption>
+  </figure>
+
+  <p>
+    So the energy branch closes as both a loss and a reranker, for the same reason stated two
+    ways: the signal the head learns is <em>how much of the drawing a state saw</em>, and at a
+    fixed input it memorises the training masks instead. Nothing here says an energy head
+    cannot rank quality in general — it says this one, trained on 60 masks per drawing, does
+    not, on the one regime where reranking would be used.
+  </p>
+</section>
+
 <section class="band">
   <h2>What this closes — and what it does not</h2>
   <p>
-    What is closed is narrow, and now measured three times: on a 203-node drawing, a 61-node
-    mandala and a 25-node chart, descending this energy never improves the redraw. To make
+    What is closed is narrow, and now measured four times: on a 203-node drawing, a 61-node
+    mandala and a 25-node chart, descending this energy never improves the redraw, and used as
+    a reranker on eight samples of one input it is at chance (0.500 / 0.505 / 0.507). To make
     that specific loop work you would need quality labels — pairs of completions <em>of the
     same mask</em>, ordered by their true error — a sampler that stays on the manifold of
     drawings the backbone can produce, or a backbone fine-tuned through the energy instead of
@@ -241,8 +339,8 @@
     beat a baseline that one forward pass reaches in 0.25 s.
   </p>
   <p>
-    That is a result about test-time search, and it is why it was published: it removes one
-    expensive assumption before the next layer is built on it. It is not a result about the
+    That is a result about test-time search and reranking, and it is why it was published:
+    it removes one expensive assumption before the next layer is built on it. It is not a result about the
     direction this project is on. That direction is already measured in the repo: three
     drawings, eight rotations each, one graph per drawing, and a label that is recoverable
     only from how the patches are arranged. Train on 0°/90°/180°/270° and test on the four
@@ -252,11 +350,11 @@
   </p>
   <p>
     What the head contributes is not a landscape. On the big graph it is a visibility signal;
-    on the small ones it is weak. Used as a <em>selector</em> rather than a loss, that is worth
-    testing where the question is real — which region to ask for before answering, which
-    drawing's topology to route a question through — but the three-drawing run already says
-    not to expect much from it on small graphs, and to score any such selector on more than
-    one drawing before trusting it.
+    on the small ones it is weak. As a <em>selector</em> it is worth nothing where a selector
+    would be used, and it matches a count of visible cells where the candidates differ in how
+    much they saw. The one thing it does that a count cannot — rank which fixed-size subset of
+    an observation was more informative — is measured at 0.671 on the 203-node drawing and
+    0.681 on the 25-node chart, and is not a question a search loop asks.
   </p>
 </section>
 
@@ -272,13 +370,19 @@
   .venv/bin/python tools/energy_experiment.py \
       --ckpt runs/$ck --out runs/energy-${ck#main-}
 done
-.venv/bin/python tools/energy_compare.py</pre>
+.venv/bin/python tools/energy_compare.py
+
+# S: the reranker. 60 train / 40 held-out masks per drawing, K = 8
+.venv/bin/python tools/energy_selector.py --steps 800 --out runs/energy-selector</pre>
     <p class="fine">
-      ~40–70 s per drawing on one thread of the phone CPU, then a second for the comparison.
-      Outputs: one <span class="mono">results.json</span> per drawing (every number quoted
-      above), <span class="mono">summary.json</span>, the heads and the figures. The code is
-      <span class="mono">mandalanet/energy.py</span> — head, state bank, training, both
-      descent loops — and two scripts that run and compare them.
+      ~40–70 s per drawing on one thread of the phone CPU for the energy run, then a second
+      for the comparison; the selector is twelve head trainings over 100 masks and takes
+      about 25 minutes. Outputs: one <span class="mono">results.json</span> per drawing
+      (every number quoted above), <span class="mono">summary.json</span>, the heads, the
+      figures, and <span class="mono">runs/energy-selector/results.json</span> with every
+      per-mask accuracy. The code is <span class="mono">mandalanet/energy.py</span> — head,
+      state bank, training, both descent loops — plus three scripts that run, compare and
+      rerank.
     </p>
   </div>
   <div class="run-side">
@@ -289,6 +393,8 @@ done
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/tools/energy_compare.py">energy_compare.py</a> — the three-drawing table and figure</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/energy/summary.json">summary.json</a> — one row per drawing</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/energy/results.json">results.json</a> — baseline, sweeps, per-node test</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/tools/energy_selector.py">energy_selector.py</a> — four candidate families, three heads, two controls</li>
+      <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/energy-selector/results.json">selector results.json</a> — per drawing, per family, per mask</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/runs/classify/metrics.json">runs/classify</a> — the multi-drawing task, 1.00 on unseen angles</li>
       <li><a href="https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/docs/design-notes.md">design notes</a> — where the idea came from</li>
       <li><a href="index.html">back to the cockpit</a></li>
@@ -305,7 +411,10 @@ done
     drawing and larger on the others; that is why every sampling result carries a standard
     deviation over eight seeds and why the chart's per-node correlations are printed but not
     leaned on. The head sees only states the frozen backbone produces, so this tests "energy
-    over a frozen model's states", not energy-based training in general.
+    over a frozen model's states", not energy-based training in general. The selector's chance
+    intervals are ±0.02–0.03 on 41 masks, so a pairwise number within about 0.05 of 0.500 is
+    not a gain; the quoted t-statistics are paired over masks, which is tighter than the cell
+    uncertainty suggests.
   </p>
   <p class="links">
     <a class="btn" href="index.html">The original demo</a>
@@ -318,7 +427,7 @@ done
 
 <footer>
   <span>Mandala-GNN · 2026</span>
-  <span class="mono">3 drawings · 203 / 61 / 25 nodes · descent helps on none</span>
+  <span class="mono">3 drawings · 203 / 61 / 25 nodes · descent and reranking help on none</span>
   <span>One branch closed · the topology line stays open</span>
 </footer>
 

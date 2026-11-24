@@ -211,10 +211,33 @@ move destroys the drawing as the score improves. The visibility ranking does
 *not* replicate (24/24, 19/24, 14/24 against 12/24 for chance), so "visibility
 scorer" is a fact about the 203-node graph, not about the method.
 
-What that closes is test-time search on a frozen backbone's states -- not the
-direction this repo is on. Topology is untouched by the result, and the same
-signal is still testable as a *selector* (how much of a drawing a state had to
-invent), scored on more than one drawing this time. Write-up and figures:
+The last open question was reranking: given eight completions, pick the one
+closest to the truth. Four candidate regimes, 60 training and 40 held-out
+masks (plus the wedge) per drawing, labels from the decoded patches so they
+never enter the head's input (`tools/energy_selector.py`,
+`runs/energy-selector/results.json`). Held-out pairwise accuracy, chance 0.5:
+
+| candidates | hex | mandala | chart |
+|---|---|---|---|
+| 8 dropout samples of the same input | **0.500** | **0.505** | **0.507** |
+| same mask, different amounts visible | 0.807 | 0.649 | 0.562 |
+| same mask, same count, different subsets | 0.671 | 0.506 | 0.681 |
+| fixed temperature, σ 1.0 / 2.0 | 0.463 / 0.475 | 0.447 / 0.553 | 0.514 / 0.539 |
+| *neighbour smoothness*, sampler (no learning) | 0.598 | 0.451 | 0.590 |
+| *count of visible cells* (no learning) | 0.794 | 0.642 | 0.525 |
+
+On the regime a reranker meets it is at chance on all three (pooled 0.504 ±
+0.014) while fitting its training masks at 0.598-0.613, and a one-line
+smoothness prior beats it on two drawings. Where it does order above chance it
+is either reproducing a count (0.807 against 0.794) or ranking which
+fixed-size subset was seen (0.671 / 0.681) -- neither is a question a search
+loop asks. The inverted-label head falls to 0.345 on the subset pairs where the
+signal is real and sits at chance on sampler pairs where there is none, so the
+loop can learn labels; there are just no useful ones at a fixed input.
+
+What that closes is test-time search *and* reranking on a frozen backbone's
+states -- not the direction this repo is on. Topology is untouched by the
+result. Write-up and figures:
 **[docs/energy.html](https://boogercheeseonrye.github.io/mandala-gnn/energy.html)**.
 
 ## What this is not

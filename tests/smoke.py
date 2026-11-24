@@ -125,6 +125,30 @@ def main() -> None:
         out = m(torch.randint(0, 256, (2, n)), feats)
         check(out.shape == (2, n, 256), f"code pos={pos}: logits shape")
 
+    # selector: the scoring has to be able to say "perfect", "inverted" and
+    # "constant" before any negative it reports means anything
+    from tools.energy_selector import oracle_score, score
+
+    gen = torch.Generator().manual_seed(0)
+    samples = []
+    for _ in range(4):
+        errs = torch.rand(6, generator=gen) * 0.01 + 0.001
+        samples.append([{"h": torch.tensor([float(e)]), "err": float(e),
+                         "seen": 10 * i} for i, e in enumerate(errs)])
+    perfect = lambda h, f, e: {"total": h[0]}           # noqa: E731
+    inverted = lambda h, f, e: {"total": -h[0]}         # noqa: E731
+    flat = lambda h, f, e: {"total": torch.tensor(0.0)}  # noqa: E731
+    check(abs(score(perfect, samples, None, None)["pairwise"] - 1.0) < 1e-9,
+          "selector: a perfect head scores 1.0 pairwise")
+    check(abs(score(inverted, samples, None, None)["pairwise"]) < 1e-9,
+          "selector: an inverted head scores 0.0 pairwise")
+    check(abs(score(flat, samples, None, None)["pairwise"] - 0.5) < 0.25,
+          "selector: a constant head is at chance")
+    check(score(perfect, samples, None, None)["top1"] == 1.0,
+          "selector: a perfect head picks the best candidate")
+    check(0.0 <= oracle_score(samples)["pairwise"] <= 1.0,
+          "selector: the visibility oracle scores in range")
+
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,
                      depth=2, blocks=1)
