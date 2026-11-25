@@ -2,11 +2,12 @@
   "envelope": {
     "params": 385120,
     "size_mb_fp32": 1.54048,
-    "bytes_per_s_1thread": 65.1711076946163,
+    "bytes_per_s_1thread": 79.12150553387454,
     "heldout_bpb": 2.4776586151365776,
     "heldout_bytes": 168960,
-    "eval_seconds": 33.42474699020386
+    "eval_seconds": 30.731191396713257
   },
+  "eval_sha256": "1913f265958b7c9d4327f1e75b2d8f48fc54dfd7af128110980498b4ed452e3a",
   "code": {
     "model": {
       "dim": 96,
@@ -20,10 +21,663 @@
     "generation": {
       "prompts": 4,
       "bytes_each": 96,
-      "bytes_per_s": 65.1711076946163,
+      "bytes_per_s": 79.12150553387454,
       "compile_rate": 0.0625,
       "compiled": 1,
       "n": 16
+    },
+    "tasks": {
+      "n": 40,
+      "greedy": {
+        "compile_rate": 0.0,
+        "pass_at_1": 0.0
+      },
+      "sampled": {
+        "compile_rate": 0.0,
+        "pass_at_1": 0.0
+      },
+      "rows": [
+        {
+          "mode": "greedy",
+          "name": "sum_list",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "mean",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "median",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "gcd",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "is_prime",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "factorial",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "fib",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "reverse_words",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "is_palindrome",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "count_vowels",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "title_words",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "flatten",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "unique",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "chunk",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "rle",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "caesar",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "word_count",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "is_anagram",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "dot",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "transpose",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "clamp",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "sign",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "binary_search",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "merge_sorted",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "rotate",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "cumsum",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "variance",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "mode",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "parse_ints",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "join_ints",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "fizzbuzz",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "collatz_len",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "celsius_to_f",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "is_sorted",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "min_max",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "count_char",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "capitalize_first",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "rolling_max",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "bin_to_dec",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "greedy",
+          "name": "is_leap",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                                "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "sum_list",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "    def modutor esictioname is not as encodinged of for efidle pars pald thor\n                  "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "mean",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "\n        the istrige inger heset\n    \"\"\"\n        self._mest('lockstattargit strouls.\n           "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "median",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        if roturn\n\n        resuble = self.self._inne starsen farn in import\n\n        delen nos t"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "gcd",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "                          eldeated is lep the the sunced bur abed rais of maile whot othe self.e"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "is_prime",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        mactood a sypysst a the fare thok a seat thoder codict(resers alopiter)\n    def det is ="
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "factorial",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "    \"\"\"\" I inamed of ompartie for code_ectonstetabliment a restile code to sye sters is varrento"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "fib",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                                                # the the is we "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "reverse_words",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        ablocking the hed singed ar gher chile if taction bo pype for her whinate if def self.co"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "is_palindrome",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "\n\n# Padich if ass is cockes not cape exter oplect thars or self.wertaddl tame\n        elthor fil"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "count_vowels",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "            return reculding exct timport)\n    realue is lasse ind in ast the ongect = '-id oupd"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "title_words",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "    \"\"\"\"\n\n                     # now in 'clasimen': mullects sonterand pand thoke of the ance\n\n "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "flatten",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "               # isperssige pechor spacction beaddition meching deod self._excovers, low) lead f"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "unique",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "            rockerecuing ad encode nor for the fod of the pith is nodes\n\n    rot for precape as "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "chunk",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "\n                         if string a ('olliggipt's', butertstrowerater) reundess the the in lea"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "rle",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "            def with los.dato sypert in tracte a sethor is is clogest.\n                is onks ="
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "caesar",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "            if marst is and self.lonend is thad o is of settimer.\n            defire chater()\n  "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "word_count",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "                     if math spet thor as the ingeder inget the sho bupse math taple\n           "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "is_anagram",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "    def chortion thing is of lead to at pord the wo che a the bame the omples in inget in san to"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "dot",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "\n        return the porkie is mode ith on urens\n\n        self._logenct(name, stulbed, atase_inea"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "transpose",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        if somport ()\n                       reeturn None:\n            return self.eadat_self.__"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "clamp",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        if are self.gesupped_lege(self, arred):\n        \"\"\"\"\n        \"\"\"\n            self._compl"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "sign",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "            # IONTHEVE _DOISMUSSMARSINDAC 'E '?'t' 'a' 'th' -' 'kind' '/'st',\n        # SMALL = "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "binary_search",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        if geturn stribunt prot is and\n\n\n                       # True paresset by impis un is d"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "merge_sorted",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        defcelf._came__thode_beccor(tion\"\",\n            treas is and contion the the whe dead fi"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "rotate",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        # congse:\n            self._semmonameade ristitimport a pist is of partion.\n    # BRetil"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "cumsum",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "                    # Vainc-leself.gruplor\n        return rest is and defile a self._comp(byple("
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "variance",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        if nor and in tand oontext is the whe firt a the texte as the ad are the cland nameEnt t"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "mode",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        self._curse._self.sock_cormment__arisit)\n\n                       for as in tromeces ment"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "parse_ints",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "\n        self.gett(next, _colt, return ind cont o self.erdad(ramen, filenterrs.Conimed(one):\n   "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "join_ints",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        return isterrod for in return treats the the pald the freculle in cooke the an be tha th"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "fizzbuzz",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": true,
+          "generated": "                                                               # is busut olinese are coublich o"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "collatz_len",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "    if _mosic = self._tomm_catarge_(notion,\n        \"\"\"  \"\"\"\n        if weth = ineles\n\n        s"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "celsius_to_f",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "    def self.wither(self, mode)\n            if be and elod bo iner ot reackes a dit and whaing n"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "is_sorted",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "                if is oder()\n            # coptor is self._rolers\n                       # beac "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "min_max",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        return tain mauss to he chally nompiond a delis a self.worveruncoded ode return the ind "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "count_char",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "    def the self._clochereater, self._best(self,\n        \"\"\"\")\n        \"\"\"\"\n        if gettor fo"
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "capitalize_first",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        self.geador in ing id sthail the cut ard conded to it thaiss is the linget he in the to "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "rolling_max",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "            self._prod(filer(self)):\n            return an cont the and and as file noder:\n     "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "bin_to_dec",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        if value freturn self.enet on the the self.wack(rowle) in codes the one\n\n        return "
+        },
+        {
+          "mode": "sample t=0.8",
+          "name": "is_leap",
+          "compiles": false,
+          "passes": false,
+          "naive_compiles": false,
+          "generated": "        deldame_trop, foding odection(self)\n        \"\"\" if andind_rooded tho madd is lect for af"
+        }
+      ]
     },
     "bigram": {
       "heldout_bpb": 6.211302757263184,
@@ -235,9 +889,9 @@
     "drawing": "drawings/hex-tessellation.jpg",
     "nodes": 203,
     "params": 405342,
-    "forward_ms": 133.15234184265137,
+    "forward_ms": 123.63512516021729,
     "passes": 8,
-    "fill_seconds": 1.0234065055847168,
+    "fill_seconds": 1.0249600410461426,
     "fill": {
       "mse": 0.1575799137353897,
       "r": 0.3600122928619385
@@ -246,12 +900,12 @@
       "cells": 25,
       "mse": 0.002449765568599105,
       "r": 0.9056612253189087,
-      "seconds": 0.1276237964630127
+      "seconds": 0.12279820442199707
     },
     "constant": {
       "mse": 0.16870488226413727,
       "r": 0.2868703603744507
     },
-    "one_pass_ms_projected": 1.065218734741211
+    "one_pass_ms_projected": 0.9890810012817383
   }
 }

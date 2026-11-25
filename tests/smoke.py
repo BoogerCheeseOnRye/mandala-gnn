@@ -150,13 +150,25 @@ def main() -> None:
           "selector: the visibility oracle scores in range")
 
     # meter: the compile check has to accept real code and reject broken code
-    from tools.gen_meter import compiles
+    from tools.gen_meter import compiles, compiles_body
     check(compiles(b"def f(x):\n    return x + 1\n"),
           "meter: a valid function compiles")
     check(not compiles(b"def f(x)\n    return 1\n"),
           "meter: a broken signature does not compile")
     check(not compiles(b"def f(x):\n    return +\n"),
           "meter: a dangling operator does not compile")
+    check(not compiles_body(b'def f(x):\n    """doc"""\n', "f"),
+          "meter: a docstring-only body does not count as compiled")
+    check(compiles_body(b'def f(x):\n    """doc"""\n    return x\n', "f"),
+          "meter: a docstring plus a body counts as compiled")
+
+    # eval set of record: sha, counts, and every reference solution passes
+    from tools.make_eval import load as load_eval, self_check
+    ev = load_eval()
+    check(len(ev["code"]["tasks"]) == 40, "eval: 40 frozen code tasks")
+    check(len(ev["drawings"]["items"]) == 36, "eval: 12 drawings per layout")
+    fails = self_check(ev)
+    check(not fails, f"eval: reference solutions pass their tests {fails[:1]}")
 
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,

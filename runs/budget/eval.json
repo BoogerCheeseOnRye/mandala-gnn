@@ -1,0 +1,564 @@
+{
+  "version": 2,
+  "kind": "images+code eval set of record",
+  "corpus_sha256": "09fb46217295054631386571409f5a949b8c65c1f5c53faed1640c97b38bf386",
+  "code": {
+    "tasks": [
+      {
+        "name": "sum_list",
+        "prompt": "def sum_list(xs):\n    \"\"\"Return the sum of the numbers in xs; 0 for an empty list.\"\"\"\n",
+        "tests": [
+          "assert sum_list([1, 2, 3]) == 6",
+          "assert sum_list([]) == 0"
+        ],
+        "solution": "    total = 0\n    for x in xs:\n        total += x\n    return total\n"
+      },
+      {
+        "name": "mean",
+        "prompt": "def mean(xs):\n    \"\"\"Return the arithmetic mean of a non-empty list of numbers.\"\"\"\n",
+        "tests": [
+          "assert abs(mean([1, 2, 3]) - 2.0) < 1e-9",
+          "assert abs(mean([2, 2]) - 2.0) < 1e-9"
+        ],
+        "solution": "    return sum(xs) / len(xs)\n"
+      },
+      {
+        "name": "median",
+        "prompt": "def median(xs):\n    \"\"\"Return the median of a non-empty list; average the middle two if even.\"\"\"\n",
+        "tests": [
+          "assert median([3, 1, 2]) == 2",
+          "assert abs(median([1, 4, 2, 3]) - 2.5) < 1e-9"
+        ],
+        "solution": "    s = sorted(xs)\n    n = len(s)\n    h = n // 2\n    if n % 2:\n        return s[h]\n    return (s[h - 1] + s[h]) / 2\n"
+      },
+      {
+        "name": "gcd",
+        "prompt": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers.\"\"\"\n",
+        "tests": [
+          "assert gcd(12, 18) == 6",
+          "assert gcd(7, 5) == 1"
+        ],
+        "solution": "    while b:\n        a, b = b, a % b\n    return a\n"
+      },
+      {
+        "name": "is_prime",
+        "prompt": "def is_prime(n):\n    \"\"\"Return True if n is prime, else False.\"\"\"\n",
+        "tests": [
+          "assert is_prime(7)",
+          "assert is_prime(2)",
+          "assert not is_prime(9)",
+          "assert not is_prime(1)"
+        ],
+        "solution": "    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n"
+      },
+      {
+        "name": "factorial",
+        "prompt": "def factorial(n):\n    \"\"\"Return n! for a non-negative integer n.\"\"\"\n",
+        "tests": [
+          "assert factorial(0) == 1",
+          "assert factorial(5) == 120"
+        ],
+        "solution": "    r = 1\n    for i in range(2, n + 1):\n        r *= i\n    return r\n"
+      },
+      {
+        "name": "fib",
+        "prompt": "def fib(n):\n    \"\"\"Return the n-th Fibonacci number, with fib(0) == 0 and fib(1) == 1.\"\"\"\n",
+        "tests": [
+          "assert fib(0) == 0",
+          "assert fib(10) == 55"
+        ],
+        "solution": "    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a\n"
+      },
+      {
+        "name": "reverse_words",
+        "prompt": "def reverse_words(s):\n    \"\"\"Return the words of s in reverse order, separated by one space.\"\"\"\n",
+        "tests": [
+          "assert reverse_words(\"a b c\") == \"c b a\""
+        ],
+        "solution": "    return \" \".join(s.split()[::-1])\n"
+      },
+      {
+        "name": "is_palindrome",
+        "prompt": "def is_palindrome(s):\n    \"\"\"True if s reads the same backwards, ignoring case and non-letters.\"\"\"\n",
+        "tests": [
+          "assert is_palindrome(\"Aba\")",
+          "assert not is_palindrome(\"ab\")"
+        ],
+        "solution": "    t = [ch.lower() for ch in s if ch.isalnum()]\n    return t == t[::-1]\n"
+      },
+      {
+        "name": "count_vowels",
+        "prompt": "def count_vowels(s):\n    \"\"\"Return how many letters in s are a, e, i, o or u, either case.\"\"\"\n",
+        "tests": [
+          "assert count_vowels(\"hello\") == 2",
+          "assert count_vowels(\"XYZ\") == 0"
+        ],
+        "solution": "    return sum(ch in \"aeiouAEIOU\" for ch in s)\n"
+      },
+      {
+        "name": "title_words",
+        "prompt": "def title_words(s):\n    \"\"\"Capitalise the first letter of every word in s, leaving the rest alone.\"\"\"\n",
+        "tests": [
+          "assert title_words(\"hello world\") == \"Hello World\""
+        ],
+        "solution": "    return \" \".join(w[:1].upper() + w[1:] for w in s.split())\n"
+      },
+      {
+        "name": "flatten",
+        "prompt": "def flatten(nested):\n    \"\"\"Flatten a list of lists into one list.\"\"\"\n",
+        "tests": [
+          "assert flatten([[1, 2], [3]]) == [1, 2, 3]",
+          "assert flatten([]) == []"
+        ],
+        "solution": "    return [x for sub in nested for x in sub]\n"
+      },
+      {
+        "name": "unique",
+        "prompt": "def unique(xs):\n    \"\"\"Return the values of xs once each, in first-seen order.\"\"\"\n",
+        "tests": [
+          "assert unique([1, 2, 1, 3]) == [1, 2, 3]"
+        ],
+        "solution": "    seen = set()\n    out = []\n    for x in xs:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out\n"
+      },
+      {
+        "name": "chunk",
+        "prompt": "def chunk(xs, k):\n    \"\"\"Split xs into consecutive lists of length k; the last may be shorter.\"\"\"\n",
+        "tests": [
+          "assert chunk([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]"
+        ],
+        "solution": "    return [xs[i:i + k] for i in range(0, len(xs), k)]\n"
+      },
+      {
+        "name": "rle",
+        "prompt": "def rle(s):\n    \"\"\"Run-length encode s as a list of (character, count) pairs.\"\"\"\n",
+        "tests": [
+          "assert rle(\"aaabb\") == [(\"a\", 3), (\"b\", 2)]"
+        ],
+        "solution": "    out = []\n    i = 0\n    while i < len(s):\n        j = i\n        while j < len(s) and s[j] == s[i]:\n            j += 1\n        out.append((s[i], j - i))\n        i = j\n    return out\n"
+      },
+      {
+        "name": "caesar",
+        "prompt": "def caesar(s, k):\n    \"\"\"Shift lowercase a-z in s by k places, wrapping; leave other characters.\"\"\"\n",
+        "tests": [
+          "assert caesar(\"abc\", 1) == \"bcd\"",
+          "assert caesar(\"xyz\", 3) == \"abc\""
+        ],
+        "solution": "    out = []\n    for ch in s:\n        if \"a\" <= ch <= \"z\":\n            out.append(chr((ord(ch) - 97 + k) % 26 + 97))\n        else:\n            out.append(ch)\n    return \"\".join(out)\n"
+      },
+      {
+        "name": "word_count",
+        "prompt": "def word_count(s):\n    \"\"\"Return a dict mapping each whitespace-separated word in s to its count.\"\"\"\n",
+        "tests": [
+          "assert word_count(\"a b a\") == {\"a\": 2, \"b\": 1}"
+        ],
+        "solution": "    d = {}\n    for w in s.split():\n        d[w] = d.get(w, 0) + 1\n    return d\n"
+      },
+      {
+        "name": "is_anagram",
+        "prompt": "def is_anagram(a, b):\n    \"\"\"True if a and b contain the same letters with the same counts.\"\"\"\n",
+        "tests": [
+          "assert is_anagram(\"listen\", \"silent\")",
+          "assert not is_anagram(\"a\", \"b\")"
+        ],
+        "solution": "    return sorted(a) == sorted(b)\n"
+      },
+      {
+        "name": "dot",
+        "prompt": "def dot(a, b):\n    \"\"\"Return the dot product of two equal-length lists of numbers.\"\"\"\n",
+        "tests": [
+          "assert dot([1, 2], [3, 4]) == 11"
+        ],
+        "solution": "    return sum(x * y for x, y in zip(a, b))\n"
+      },
+      {
+        "name": "transpose",
+        "prompt": "def transpose(m):\n    \"\"\"Return the transpose of a list of equal-length rows.\"\"\"\n",
+        "tests": [
+          "assert transpose([[1, 2], [3, 4]]) == [[1, 3], [2, 4]]"
+        ],
+        "solution": "    return [list(row) for row in zip(*m)]\n"
+      },
+      {
+        "name": "clamp",
+        "prompt": "def clamp(x, lo, hi):\n    \"\"\"Return x limited to the range lo..hi.\"\"\"\n",
+        "tests": [
+          "assert clamp(5, 0, 3) == 3",
+          "assert clamp(-1, 0, 3) == 0",
+          "assert clamp(2, 0, 3) == 2"
+        ],
+        "solution": "    return max(lo, min(hi, x))\n"
+      },
+      {
+        "name": "sign",
+        "prompt": "def sign(x):\n    \"\"\"Return -1, 0 or 1 according to the sign of x.\"\"\"\n",
+        "tests": [
+          "assert sign(-2) == -1",
+          "assert sign(0) == 0",
+          "assert sign(7) == 1"
+        ],
+        "solution": "    if x > 0:\n        return 1\n    if x < 0:\n        return -1\n    return 0\n"
+      },
+      {
+        "name": "binary_search",
+        "prompt": "def binary_search(xs, target):\n    \"\"\"Return the index of target in sorted xs, or -1 if it is absent.\"\"\"\n",
+        "tests": [
+          "assert binary_search([1, 3, 5], 3) == 1",
+          "assert binary_search([1, 3, 5], 4) == -1"
+        ],
+        "solution": "    lo, hi = 0, len(xs) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if xs[mid] == target:\n            return mid\n        if xs[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\n"
+      },
+      {
+        "name": "merge_sorted",
+        "prompt": "def merge_sorted(a, b):\n    \"\"\"Merge two ascending lists into one ascending list.\"\"\"\n",
+        "tests": [
+          "assert merge_sorted([1, 3], [2, 4]) == [1, 2, 3, 4]"
+        ],
+        "solution": "    out = []\n    i = j = 0\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            out.append(a[i])\n            i += 1\n        else:\n            out.append(b[j])\n            j += 1\n    return out + a[i:] + b[j:]\n"
+      },
+      {
+        "name": "rotate",
+        "prompt": "def rotate(xs, k):\n    \"\"\"Return xs rotated right by k places.\"\"\"\n",
+        "tests": [
+          "assert rotate([1, 2, 3], 1) == [3, 1, 2]",
+          "assert rotate([1, 2, 3], 3) == [1, 2, 3]"
+        ],
+        "solution": "    if not xs:\n        return []\n    k %= len(xs)\n    return xs[-k:] + xs[:-k] if k else list(xs)\n"
+      },
+      {
+        "name": "cumsum",
+        "prompt": "def cumsum(xs):\n    \"\"\"Return the running totals of xs, of the same length.\"\"\"\n",
+        "tests": [
+          "assert cumsum([1, 2, 3]) == [1, 3, 6]"
+        ],
+        "solution": "    out = []\n    total = 0\n    for x in xs:\n        total += x\n        out.append(total)\n    return out\n"
+      },
+      {
+        "name": "variance",
+        "prompt": "def variance(xs):\n    \"\"\"Return the population variance of a non-empty list of numbers.\"\"\"\n",
+        "tests": [
+          "assert abs(variance([1, 2, 3]) - 2 / 3) < 1e-9"
+        ],
+        "solution": "    m = sum(xs) / len(xs)\n    return sum((x - m) ** 2 for x in xs) / len(xs)\n"
+      },
+      {
+        "name": "mode",
+        "prompt": "def mode(xs):\n    \"\"\"Return the most common value of a non-empty list; ties keep the first seen.\"\"\"\n",
+        "tests": [
+          "assert mode([1, 1, 2]) == 1",
+          "assert mode([4, 4, 2, 2]) == 4"
+        ],
+        "solution": "    best, best_n = xs[0], 0\n    for x in xs:\n        n = xs.count(x)\n        if n > best_n:\n            best, best_n = x, n\n    return best\n"
+      },
+      {
+        "name": "parse_ints",
+        "prompt": "def parse_ints(s):\n    \"\"\"Parse whitespace-separated integers in s into a list of ints.\"\"\"\n",
+        "tests": [
+          "assert parse_ints(\"1 2 3\") == [1, 2, 3]"
+        ],
+        "solution": "    return [int(x) for x in s.split()]\n"
+      },
+      {
+        "name": "join_ints",
+        "prompt": "def join_ints(xs, sep):\n    \"\"\"Join a list of integers with sep, as strings.\"\"\"\n",
+        "tests": [
+          "assert join_ints([1, 2], \"-\") == \"1-2\""
+        ],
+        "solution": "    return sep.join(str(x) for x in xs)\n"
+      },
+      {
+        "name": "fizzbuzz",
+        "prompt": "def fizzbuzz(n):\n    \"\"\"Return a list for 1..n: Fizz for multiples of 3, Buzz of 5, FizzBuzz of both.\"\"\"\n",
+        "tests": [
+          "assert fizzbuzz(5) == [1, 2, \"Fizz\", 4, \"Buzz\"]"
+        ],
+        "solution": "    out = []\n    for i in range(1, n + 1):\n        if i % 15 == 0:\n            out.append(\"FizzBuzz\")\n        elif i % 3 == 0:\n            out.append(\"Fizz\")\n        elif i % 5 == 0:\n            out.append(\"Buzz\")\n        else:\n            out.append(i)\n    return out\n"
+      },
+      {
+        "name": "collatz_len",
+        "prompt": "def collatz_len(n):\n    \"\"\"Return how many terms the Collatz sequence takes to reach 1, counting n and 1.\"\"\"\n",
+        "tests": [
+          "assert collatz_len(6) == 9",
+          "assert collatz_len(1) == 1"
+        ],
+        "solution": "    count = 1\n    while n != 1:\n        n = n // 2 if n % 2 == 0 else 3 * n + 1\n        count += 1\n    return count\n"
+      },
+      {
+        "name": "celsius_to_f",
+        "prompt": "def celsius_to_f(c):\n    \"\"\"Convert degrees Celsius to degrees Fahrenheit.\"\"\"\n",
+        "tests": [
+          "assert abs(celsius_to_f(0) - 32.0) < 1e-9",
+          "assert abs(celsius_to_f(100) - 212.0) < 1e-9"
+        ],
+        "solution": "    return c * 9 / 5 + 32\n"
+      },
+      {
+        "name": "is_sorted",
+        "prompt": "def is_sorted(xs):\n    \"\"\"True if xs is in non-decreasing order.\"\"\"\n",
+        "tests": [
+          "assert is_sorted([1, 2, 2])",
+          "assert not is_sorted([2, 1])"
+        ],
+        "solution": "    return all(xs[i] <= xs[i + 1] for i in range(len(xs) - 1))\n"
+      },
+      {
+        "name": "min_max",
+        "prompt": "def min_max(xs):\n    \"\"\"Return (smallest, largest) of a non-empty list.\"\"\"\n",
+        "tests": [
+          "assert min_max([3, 1, 2]) == (1, 3)"
+        ],
+        "solution": "    return min(xs), max(xs)\n"
+      },
+      {
+        "name": "count_char",
+        "prompt": "def count_char(s, c):\n    \"\"\"Return how many times the character c occurs in s.\"\"\"\n",
+        "tests": [
+          "assert count_char(\"happy\", \"p\") == 2"
+        ],
+        "solution": "    return s.count(c)\n"
+      },
+      {
+        "name": "capitalize_first",
+        "prompt": "def capitalize_first(s):\n    \"\"\"Upper-case the first character of s and leave the rest unchanged.\"\"\"\n",
+        "tests": [
+          "assert capitalize_first(\"hello there\") == \"Hello there\""
+        ],
+        "solution": "    return s[:1].upper() + s[1:]\n"
+      },
+      {
+        "name": "rolling_max",
+        "prompt": "def rolling_max(xs, k):\n    \"\"\"Return the maximum of every window of length k in xs.\"\"\"\n",
+        "tests": [
+          "assert rolling_max([1, 3, 2, 5], 2) == [3, 3, 5]"
+        ],
+        "solution": "    return [max(xs[i:i + k]) for i in range(len(xs) - k + 1)]\n"
+      },
+      {
+        "name": "bin_to_dec",
+        "prompt": "def bin_to_dec(s):\n    \"\"\"Convert a string of 0s and 1s to an integer.\"\"\"\n",
+        "tests": [
+          "assert bin_to_dec(\"101\") == 5"
+        ],
+        "solution": "    return int(s, 2)\n"
+      },
+      {
+        "name": "is_leap",
+        "prompt": "def is_leap(year):\n    \"\"\"True for a leap year in the Gregorian calendar.\"\"\"\n",
+        "tests": [
+          "assert is_leap(2024)",
+          "assert not is_leap(1900)",
+          "assert is_leap(2000)"
+        ],
+        "solution": "    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)\n"
+      }
+    ],
+    "heldout_files": [
+      "asyncio/queues.py",
+      "compileall.py",
+      "email/errors.py",
+      "encodings/cp1258.py",
+      "encodings/iso8859_14.py",
+      "encodings/utf_16.py",
+      "idlelib/autocomplete.py",
+      "idlelib/pyshell.py",
+      "importlib/metadata/_itertools.py",
+      "lib2to3/fixes/fix_itertools_imports.py",
+      "msilib/__init__.py",
+      "operator.py"
+    ],
+    "sha256": "956313d5e55d00016e150ec040d3ec218995fbe795fda1329438143efc9c5b11"
+  },
+  "drawings": {
+    "per_layout": 12,
+    "seed_start": 1000,
+    "layouts": [
+      "hex",
+      "rings",
+      "chart"
+    ],
+    "generator": "mandalanet.synth.sample",
+    "items": [
+      {
+        "layout": "hex",
+        "seed": 1000,
+        "sha256": "3847d17580b566baecdb1e8be19e1566d0129d4c489c6f4e91cec92b6893348a"
+      },
+      {
+        "layout": "hex",
+        "seed": 1001,
+        "sha256": "3c190dc81df480a149c5e74673a278632e2736c696e97abce4d4e0b3aa839d3a"
+      },
+      {
+        "layout": "hex",
+        "seed": 1002,
+        "sha256": "b6e3952e131b72c858192d0bd36ac01d15133677fee29c2f8e7493dd78dc4fe5"
+      },
+      {
+        "layout": "hex",
+        "seed": 1003,
+        "sha256": "4c1ed127781871b2fe8d022cae3b040ee08dd9911561a6cb007a23be90f2e19e"
+      },
+      {
+        "layout": "hex",
+        "seed": 1004,
+        "sha256": "fef17d0e785f9e1072fda54aee09808fb35db10441da853f09f65f7f8f20a792"
+      },
+      {
+        "layout": "hex",
+        "seed": 1005,
+        "sha256": "d0d87f00e1043b81fe0c5eb7e41805799a9682251e3bad0a7a003b7df1765750"
+      },
+      {
+        "layout": "hex",
+        "seed": 1006,
+        "sha256": "59be8f052da134b056b93ca153e3459c27abe28c989fb0341c01eece9239cb1a"
+      },
+      {
+        "layout": "hex",
+        "seed": 1007,
+        "sha256": "1d0e070af0fa3156bf796becfff1ea1d034df3039c8ba56a637d5f59a1d42b68"
+      },
+      {
+        "layout": "hex",
+        "seed": 1008,
+        "sha256": "173ebd91966486a252e88a711077f3e421c63bca22e251a654b7d0ce1eca1cf6"
+      },
+      {
+        "layout": "hex",
+        "seed": 1009,
+        "sha256": "826840494488a6857a84af368ba9030e426d05a48791c31c60f0f7ada3aa98d0"
+      },
+      {
+        "layout": "hex",
+        "seed": 1010,
+        "sha256": "b94ca3d30916a42dba6b5e3842a32fa5066eb24426a2f56ab2d2486d09e31024"
+      },
+      {
+        "layout": "hex",
+        "seed": 1011,
+        "sha256": "df683fcbeeb1c096cac34c10c027d31c1106d2e6f69903280a7dfc9e0d72a3ad"
+      },
+      {
+        "layout": "rings",
+        "seed": 1000,
+        "sha256": "7d6be654167020bdeff869b8f0487a54e1d2a014e048efe1c413a36c58937a54"
+      },
+      {
+        "layout": "rings",
+        "seed": 1001,
+        "sha256": "d7b097e414d6f34402f3dd855e9afae14df5492c851e4bfa7d55fcd297dd0c8d"
+      },
+      {
+        "layout": "rings",
+        "seed": 1002,
+        "sha256": "0721590b3dd7be35f3d69c33e3fccfc0662652a30e532127f21071090fe07249"
+      },
+      {
+        "layout": "rings",
+        "seed": 1003,
+        "sha256": "884995b4d68760a5000f04c03642ea64c03d57d7078939eca4a20ad0a2a55f38"
+      },
+      {
+        "layout": "rings",
+        "seed": 1004,
+        "sha256": "96e6acd8c0546957ab6ac31e0a15841cc05a070d10979a07cbd858933ef6ba37"
+      },
+      {
+        "layout": "rings",
+        "seed": 1005,
+        "sha256": "fdbe26aeca29548187b1c7a33d98d185ca1b634619c4f602ca4e29d4e3cb9adc"
+      },
+      {
+        "layout": "rings",
+        "seed": 1006,
+        "sha256": "c630a54ddc55739a45234c4f31a9ba2e7698e1ae549683fde1422d7fa88fead8"
+      },
+      {
+        "layout": "rings",
+        "seed": 1007,
+        "sha256": "adc40dc8fcdfc2220f85e6ac64be53d9e2b79854a69e12390db5ab82f11b42af"
+      },
+      {
+        "layout": "rings",
+        "seed": 1008,
+        "sha256": "74477eefc0eb387737d5975a578a1beb529dd068fac7b92da633504d12bb3042"
+      },
+      {
+        "layout": "rings",
+        "seed": 1009,
+        "sha256": "95af01dcde821e6007c18002127e3e4f4cc84517c0f608ea024e832b7f0e4d34"
+      },
+      {
+        "layout": "rings",
+        "seed": 1010,
+        "sha256": "810dbf14202d74e0abdd5aa68b78049b4da7ebcc73e796194568f5bdb9d78f8d"
+      },
+      {
+        "layout": "rings",
+        "seed": 1011,
+        "sha256": "9436467c925df355407c168beaf1fa21c4e407a086ece01c49d0fa9cd39b7c93"
+      },
+      {
+        "layout": "chart",
+        "seed": 1000,
+        "sha256": "fb981c512da42d9faecabbfe85b18898ebfba6e6490d174271c02fd27f4634c9"
+      },
+      {
+        "layout": "chart",
+        "seed": 1001,
+        "sha256": "c65e3099a90864309caabd5d1d973a5608f08a6ccfc11ed22b0d0de82973ef34"
+      },
+      {
+        "layout": "chart",
+        "seed": 1002,
+        "sha256": "c778bb7524fde634e60625291c3a16a68d14abfdde366b3709ec7afdd37c3e2c"
+      },
+      {
+        "layout": "chart",
+        "seed": 1003,
+        "sha256": "6dd569b7c4e46069327ea3c78214b73cb48c176bc6f7b4325bd7c272d3b4ef61"
+      },
+      {
+        "layout": "chart",
+        "seed": 1004,
+        "sha256": "25e15f9f386089c7efb9d5c3b47c735616bb811ad5282d49729f83d1e6124605"
+      },
+      {
+        "layout": "chart",
+        "seed": 1005,
+        "sha256": "d2924a440bc443d8df117a09b2ddc7b77f901a2f7db5cdf63d9bd28354f42ccf"
+      },
+      {
+        "layout": "chart",
+        "seed": 1006,
+        "sha256": "8bbca684595e81e9abf3f2b5d25be02d5b03a7dde4b190b585bd22c2b761b7c2"
+      },
+      {
+        "layout": "chart",
+        "seed": 1007,
+        "sha256": "5a94e5630d988806e7cb5610b121b7593bcc25302254352a310fb15bbb528b67"
+      },
+      {
+        "layout": "chart",
+        "seed": 1008,
+        "sha256": "7c69108137f937431a9def784406ff04a4ebbcee24a12ddabbcc50fcf240c1b0"
+      },
+      {
+        "layout": "chart",
+        "seed": 1009,
+        "sha256": "0b75481917a296e7169ba6bc443c5ef6ef2d9b3766317ea3d29dbac04ad48975"
+      },
+      {
+        "layout": "chart",
+        "seed": 1010,
+        "sha256": "c554bec4c19652e905c9b83c85d17832b65e83f1db5b7bd31d44654a76434ded"
+      },
+      {
+        "layout": "chart",
+        "seed": 1011,
+        "sha256": "d8e3ffdbb66910cc777f6aae5e3f1bfc3252ae0f4543cbcf554b97a77323fa16"
+      }
+    ],
+    "sha256": "226e2557b31a3bb987d044fad63c21363491890921a166fff956caa3c3cf23f7"
+  },
+  "sha256": "1913f265958b7c9d4327f1e75b2d8f48fc54dfd7af128110980498b4ed452e3a"
+}

@@ -400,11 +400,13 @@ gate and a kill, and every number comes from `tools/` on this device.
    hex GNN's eight-pass fill against a constant-image floor. Later steps are
    scored only against this table. *Gate: the table exists and is reproducible
    with one command.*
-2. **Evaluation sets of record.** 40 held-out Python functions with a
-   docstring + unit test each, and 12 held-out drawings per layout, frozen by
-   SHA in `runs/budget/eval.json`. *Gate: no file in either set appears in
-   training; the SHA is checked by the meter.* *Kill: none — without this,
-   steps 3–8 are unfalsifiable.*
+2. **Evaluation sets of record (done, `runs/budget/eval.json`).** 40
+   hand-written Python tasks (signature + docstring prompt, unit tests, and a
+   reference body that has to pass those tests) and 36 synthetic drawings
+   (12 per layout, seeds 1000–1011), frozen under one SHA. `make_eval.py`
+   checks that no task prompt occurs in the training bytes and that the 12
+   held-out files are actually held out; `--selftest` and `--verify` are in
+   the smoke tests. *Gate: the sha verifies and every solution passes.*
 3. **The code model under a fixed 20-minute CPU budget.** Sweep dim 96/128/192
    and depth 3/6/9 at ~0.4 M and ~1.5 M parameters, same corpus, two seeds;
    report bits/byte **and** compile rate. Pick on compile rate first. *Gate:
@@ -481,6 +483,35 @@ Three things the meter already says, before any new model:
   generation claim has to be earned with a schedule it was trained for, or
   with a different decoder (step 6). This is the most important row in the
   table.
+
+
+### Step 2, measured
+
+`tools/make_eval.py` → `runs/budget/eval.json`, sha **1913f265…**, rebuilt and
+re-verified (40 tasks, sha `956313d5…`; 36 drawings, sha `226e2557…`; corpus
+sha matches the training data). All 40 reference solutions pass their own
+tests, all 36 drawings re-render to their hashes, and no task prompt or
+held-out path occurs in the training bytes.
+
+The step-1 model, scored on that set:
+
+| | greedy | sample t=0.8 |
+|---|---|---|
+| naive `compile()` | **40 / 40** | 4 / 40 |
+| compiles with a real body | **0 / 40** | 0 / 40 |
+| passes the task's tests (pass@1) | **0 / 40** | 0 / 40 |
+
+The first row is the one to keep: greedy decoding emits 96 blank characters
+after the docstring, which is valid Python, so a naive compile check reports
+100% and means nothing. The scored metric requires a statement after the
+docstring, and on that metric the model has written no function body at all.
+Its one sampled success in step 1 was an in-distribution CPython continuation,
+not an answer to a docstring.
+
+That sets the floors honestly: step 3 has to get a *body* to compile on more
+than four of these prompts, and step 5's 5/40 bar starts from zero, where any
+test that passes is a real signal. The 36 drawings are for step 6 and have not
+been used yet.
 
 ## Non-goals, stated once
 

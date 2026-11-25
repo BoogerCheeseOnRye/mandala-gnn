@@ -27,6 +27,7 @@ steps 3-9 can reuse it; `--reuse` skips the ~11 minute training run.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import math
 import os
@@ -44,6 +45,7 @@ from mandalanet.graph import Graph  # noqa: E402
 from mandalanet.model import masked_corr, masked_mse  # noqa: E402
 from tools.code_experiment import load_corpus  # noqa: E402
 from tools.energy_experiment import load, pearson  # noqa: E402
+from tools.make_eval import load as load_eval, run as run_task  # noqa: E402
 
 PROMPTS = [
     # every prompt is left-padded to the longest, so one batch can share a
@@ -120,12 +122,38 @@ def generate(model: CodeLM, prompts: list[bytes], n_new: int, seed: int,
     return [bytes(row[L:].tolist()) for row in idx]
 
 
+def printable(s: str) -> str:
+    return "".join(ch if ch.isprintable() or ch in "\n\t" else "·" for ch in s)
+
+
 def compiles(text: bytes) -> bool:
     try:
         compile(text.decode("utf-8", "replace"), "<generated>", "exec")
         return True
     except SyntaxError:
         return False
+
+
+def compiles_body(text: bytes, name: str) -> bool:
+    """Compile, and require a real body after the docstring.
+
+    A docstring-only function is valid Python, so whitespace continuation
+    passes a naive compile check. On a docstring prompt that made the compile
+    rate 100% and meant nothing; this is the metric the tasks use.
+    """
+    try:
+        tree = ast.parse(text.decode("utf-8", "replace"))
+    except SyntaxError:
+        return False
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef) and node.name == name:
+            body = node.body
+            if (body and isinstance(body[0], ast.Expr)
+                    and isinstance(body[0].value, ast.Constant)
+                    and isinstance(body[0].value.value, str)):
+                body = body[1:]
+            return bool(body)
+    return False
 
 
 def bigram(corpus: dict) -> dict:
@@ -231,11 +259,17 @@ def main() -> None:
     p.add_argument("--corpus", default="runs/code/corpus.pt")
     p.add_argument("--corpus-src", default="/tmp/opencode/cpy/cpython-3.12.0/Lib")
     p.add_argument("--ckpt", default="runs/main-hex")
+    p.add_argument("--eval", dest="eval_path", default="runs/budget/eval.json")
     p.add_argument("--out", default="runs/budget")
     p.add_argument("--reuse", action="store_true")
     a = p.parse_args()
     os.makedirs(a.out, exist_ok=True)
     ckpt_path = os.path.join(a.out, "code-rope.pt")
+
+    ev = load_eval(a.eval_path)          # raises if the sha does not verify
+    tasks = ev["code"]["tasks"]
+    print(f"eval     sha {ev['sha256'][:12]} · {len(tasks)} tasks · "
+          f"{len(ev['drawings']['items'])} drawings", flush=True)
 
     corpus = load_corpus(a.corpus, a.corpus_src)
     print(f"corpus sha {corpus['sha256'][:12]} · train "
@@ -282,6 +316,31 @@ def main() -> None:
                   flush=True)
     bytes_per_s = total_bytes / (time.time() - t0)
 
+    # scored set: the frozen 40 tasks, greedy and one sampled seed
+    task_rows = []
+    task_prompts = [t["prompt"].encode() for t in tasks]
+    t0 = time.time()
+    for mode, temp in (("greedy", None), ("sample t=0.8", 0.8)):
+        outs = generate(model, task_prompts, N_NEW, 0, temp)
+        for t, pr, out in zip(tasks, task_prompts, outs):
+            full = pr + out
+            naive = compiles(full)
+            ok_compile = compiles_body(full, t["name"])
+            ok_pass = False
+            if ok_compile:
+                code = (full.decode("utf-8", "replace") + "\n"
+                        + "\n".join(t["tests"]) + "\n")
+                ok_pass = run_task(code)
+            task_rows.append({"mode": mode, "name": t["name"],
+                              "compiles": ok_compile, "passes": ok_pass,
+                              "naive_compiles": naive,
+                              "generated": out.decode("utf-8", "replace")})
+        print(f"  tasks {mode:18s} {len(tasks)} prompts · "
+              f"{time.time() - t0:.0f}s", flush=True)
+
+    def task_rate(rows: list[dict], key: str) -> float:
+        return sum(r[key] for r in rows) / len(rows)
+
     bg = bigram(corpus)
     bg_samples = []
     for seed in (0, 1, 2):
@@ -303,6 +362,7 @@ def main() -> None:
             "heldout_bytes": n_val,
             "eval_seconds": eval_s,
         },
+        "eval_sha256": ev["sha256"],
         "code": {
             "model": {"dim": 96, "depth": 3, "heads": 4, "ctx": 256, "pos": "rope",
                       "steps": a.steps},
@@ -312,6 +372,22 @@ def main() -> None:
                            "compile_rate": rate(samples),
                            "compiled": sum(r["compiles"] for r in samples),
                            "n": len(samples)},
+            "tasks": {
+                "n": len(tasks),
+                "greedy": {"compile_rate": task_rate(
+                               [r for r in task_rows if r["mode"] == "greedy"],
+                               "compiles"),
+                           "pass_at_1": task_rate(
+                               [r for r in task_rows if r["mode"] == "greedy"],
+                               "passes")},
+                "sampled": {"compile_rate": task_rate(
+                                [r for r in task_rows if r["mode"] != "greedy"],
+                                "compiles"),
+                            "pass_at_1": task_rate(
+                                [r for r in task_rows if r["mode"] != "greedy"],
+                                "passes")},
+                "rows": task_rows,
+            },
             "bigram": {"heldout_bpb": bg["bits_per_byte"],
                        "compile_rate": rate(bg_samples),
                        "compiled": sum(r["compiles"] for r in bg_samples),
@@ -327,6 +403,15 @@ def main() -> None:
             f.write(f"=== {r['mode']} · seed {r['seed']} · "
                     f"{'COMPILES' if r['compiles'] else 'syntax error'} ===\n")
             f.write(r["prompt"] + r["generated"] + "\n\n")
+        for r in task_rows:
+            verdict = ("PASSES" if r["passes"] else
+                       "body compiles" if r["compiles"] else
+                       "docstring only" if r["naive_compiles"] else
+                       "syntax error")
+            f.write(f"=== task {r['name']} · {r['mode']} · {verdict} ===\n")
+            f.write(printable(next(t["prompt"] for t in tasks
+                                   if t["name"] == r["name"])
+                              + r["generated"]) + "\n\n")
 
     print()
     print(f"{'code':22s} {'params':>9s} {'b/B':>6s} {'B/s':>6s} {'compiles':>10s}")
@@ -334,6 +419,11 @@ def main() -> None:
           f"{bytes_per_s:6.0f} {rate(samples):9.1%}")
     print(f"{'  bigram floor':22s} {0:9d} {bg['bits_per_byte']:6.3f} {'—':>6s} "
           f"{rate(bg_samples):9.1%}")
+    g = res["code"]["tasks"]["greedy"]
+    sm = res["code"]["tasks"]["sampled"]
+    print(f"  40 tasks: greedy compile {g['compile_rate']:5.1%} · pass@1 "
+          f"{g['pass_at_1']:5.1%} | sampled compile {sm['compile_rate']:5.1%} · "
+          f"pass@1 {sm['pass_at_1']:5.1%}")
     im = res["image"]
     print(f"{'image':22s} {'ms/pass':>9s} {'fill s':>6s} {'MSE':>6s} {'r':>6s}")
     print(f"  {os.path.basename(im['drawing']):20s} {im['forward_ms']:9.0f} "

@@ -246,7 +246,11 @@ Step 1 is measured: the 385 k byte model reproduces R1 at 2.478 bits/byte and
 generates at 65-83 B/s single-thread (1 of 16 continuations compiles), while
 the 405 k GNN completes a held-out wedge at r 0.906 but only reaches r 0.360
 when asked to draw from an empty canvas, against 0.287 for a constant image.
-Those are the numbers later steps have to beat.
+Step 2 froze the scoreboard: 40 hand-written docstring tasks with unit tests and
+36 held-out drawings, under one SHA. On those tasks the same model compiles a
+real function body on 0 of 40 (a naive `compile()` says 40 of 40, because
+whitespace is valid Python) and passes 0 of 40. Those are the numbers later
+steps have to beat.
 
 ## What this is not
 
