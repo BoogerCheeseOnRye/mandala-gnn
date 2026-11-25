@@ -407,12 +407,14 @@ gate and a kill, and every number comes from `tools/` on this device.
    checks that no task prompt occurs in the training bytes and that the 12
    held-out files are actually held out; `--selftest` and `--verify` are in
    the smoke tests. *Gate: the sha verifies and every solution passes.*
-3. **The code model under a fixed 20-minute CPU budget.** Sweep dim 96/128/192
-   and depth 3/6/9 at ~0.4 M and ~1.5 M parameters, same corpus, two seeds;
-   report bits/byte **and** compile rate. Pick on compile rate first. *Gate:
-   compile rate beats the n-gram floor by ≥ 10 points.* *Kill: no arm beats
-   the floor — then the byte model is a completion toy, not a code model, and
-   the conditional step is dropped.*
+3. **The code model under a fixed token budget (running).** The baseline is
+   385 k parameters and 1.2 M tokens; two things could explain 0/40. The
+   first arm therefore holds the tokens fixed and quadruples capacity (dim
+   128, depth 6, ~1.5 M parameters, checkpoints at 600 and 1,200 steps). If
+   that does not move the number, a second arm gives the 385 k model 3× the
+   tokens. *Gate: body-compile on ≥ 4 of 40 or pass@1 > 0 on the frozen set.*
+   *Kill: neither arm moves either metric — then the byte model is a
+   completion toy at this budget and the conditional step (5) is cut.*
 4. **Fast sampling.** The current loop recomputes the whole window per byte;
    add a KV cache and torch int8 dynamic quantization, measure bytes/s and the
    bits/byte cost. *Gate: ≥ 1 kB/s single-thread at ≤ 1% bits/byte regression,
