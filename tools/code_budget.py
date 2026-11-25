@@ -91,12 +91,35 @@ def main() -> None:
     p.add_argument("--corpus-src", default="/tmp/opencode/cpy/cpython-3.12.0/Lib")
     p.add_argument("--eval", dest="eval_path", default="runs/budget/eval.json")
     p.add_argument("--out", default="runs/code-budget")
+    p.add_argument("--rescore", action="store_true",
+                   help="re-parse saved completions under the current body rule")
     a = p.parse_args()
     os.makedirs(a.out, exist_ok=True)
     torch.set_num_threads(8)
 
     ev = load_eval(a.eval_path)
     tasks = ev["code"]["tasks"]
+
+    if a.rescore:
+        path = os.path.join(a.out, "results.json")
+        with open(path) as f:
+            d = json.load(f)
+        for ck in d["checkpoints"]:
+            for r in ck["tasks"]["rows"]:
+                task = next(t for t in tasks if t["name"] == r["name"])
+                r["compiles"] = compiles_body(
+                    (task["prompt"] + r["generated"]).encode(), task["name"])
+                if not r["compiles"]:
+                    r["passes"] = False
+            for mode, key in (("greedy", "greedy"), ("sample t=0.8", "sampled")):
+                rows = [r for r in ck["tasks"]["rows"] if r["mode"] == mode]
+                ck["tasks"][key] = {
+                    "compile_rate": sum(r["compiles"] for r in rows) / len(rows),
+                    "pass_at_1": sum(r["passes"] for r in rows) / len(rows)}
+        with open(path, "w") as f:
+            json.dump(d, f, indent=2)
+        print("rescored", path)
+        return
     corpus = load_corpus(a.corpus, a.corpus_src)
     print(f"eval sha {ev['sha256'][:12]} · {len(tasks)} tasks · corpus "
           f"{corpus['train_bytes'].numel():,} bytes", flush=True)

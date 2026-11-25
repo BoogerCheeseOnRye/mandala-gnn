@@ -147,11 +147,11 @@ def compiles_body(text: bytes, name: str) -> bool:
         return False
     for node in tree.body:
         if isinstance(node, ast.FunctionDef) and node.name == name:
-            body = node.body
-            if (body and isinstance(body[0], ast.Expr)
-                    and isinstance(body[0].value, ast.Constant)
-                    and isinstance(body[0].value.value, str)):
-                body = body[1:]
+            def docstring(n: ast.stmt) -> bool:
+                return (isinstance(n, ast.Expr)
+                        and isinstance(n.value, ast.Constant)
+                        and isinstance(n.value.value, str))
+            body = [n for n in node.body if not docstring(n)]
             return bool(body)
     return False
 

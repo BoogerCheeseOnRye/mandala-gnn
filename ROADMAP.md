@@ -515,6 +515,27 @@ than four of these prompts, and step 5's 5/40 bar starts from zero, where any
 test that passes is a real signal. The 36 drawings are for step 6 and have not
 been used yet.
 
+### Step 3, first arm: capacity
+
+`tools/code_budget.py --dim 128 --depth 6 --steps 1200` → 1,255,680 parameters
+at the baseline's 1.23 M tokens, checkpoints at 600 and 1,200 steps.
+
+| step | bits/byte | body compiles (greedy / sampled) | pass@1 |
+|---|---|---|---|
+| 600 | 2.506 | 0 / 40 · 0 / 40 | 0 / 40 |
+| 1,200 | **2.296** | 0 / 40 · 0 / 40 | 0 / 40 |
+| *385 k at 1,200* | *2.478* | *0 / 40 · 0 / 40* | *0 / 40* |
+
+Capacity buys bits/byte (2.478 → 2.296, 7% lower) and buys nothing on the task
+set: still no function body, still no test passed. One sampled completion did
+parse as a body — and it was a second docstring, which the metric had counted.
+The rule is now "a statement that is not a string literal", every checkpoint
+was rescored from its saved completions (the text is unchanged), and the row
+above is the corrected one. That is a one-line tightening of the metric, not a
+change to any number that was measured.
+
+Per the pre-registered rule, tokens are next: the 385 k model at 3,600 steps.
+
 ## Non-goals, stated once
 
 * No OGB/LRGB leaderboard runs. A 405 k model will not be competitive there,

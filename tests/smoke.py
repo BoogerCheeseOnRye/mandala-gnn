@@ -159,6 +159,8 @@ def main() -> None:
           "meter: a dangling operator does not compile")
     check(not compiles_body(b'def f(x):\n    """doc"""\n', "f"),
           "meter: a docstring-only body does not count as compiled")
+    check(not compiles_body(b'def f(x):\n    """doc"""\n    """more"""\n', "f"),
+          "meter: a second docstring is not a function body")
     check(compiles_body(b'def f(x):\n    """doc"""\n    return x\n', "f"),
           "meter: a docstring plus a body counts as compiled")
 
