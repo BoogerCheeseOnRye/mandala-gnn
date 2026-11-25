@@ -25,6 +25,18 @@ def check(cond: bool, msg: str) -> None:
     print(f"ok  {msg}")
 
 
+def generate_torch(model, prompts, n_new):
+    """Greedy decode, the same loop the meter uses (no warm-up, no sampling)."""
+    L = max(len(p) for p in prompts)
+    idx = torch.full((len(prompts), L), 10, dtype=torch.long)
+    for i, p in enumerate(prompts):
+        idx[i, L - len(p):] = torch.tensor(list(p))
+    with torch.no_grad():
+        for _ in range(n_new):
+            idx = torch.cat([idx, model(idx)[:, -1].argmax(-1)[:, None]], 1)
+    return [bytes(row[L:].tolist()) for row in idx]
+
+
 def main() -> None:
     for kind in ("hex", "grid", "rings", "chart", "random", "jitter", "none"):
         m = build_mesh(kind, size=64)
@@ -171,6 +183,42 @@ def main() -> None:
     check(len(ev["drawings"]["items"]) == 36, "eval: 12 drawings per layout")
     fails = self_check(ev)
     check(not fails, f"eval: reference solutions pass their tests {fails[:1]}")
+
+    # numpy sampler: the export has to reproduce torch exactly, in both the
+    # exact-weight and the int8-on-disk form, because step 4's speed numbers
+    # are only worth anything if the bytes are the same bytes
+    import math
+    import tempfile
+
+    from mandalanet.npcode import _erf, NumpyLM, export
+
+    grid = torch.linspace(-5, 5, 2001)
+    want = torch.erf(grid).numpy()
+    check(float(abs(_erf(grid.numpy().astype("float32")) - want).max()) < 1e-6,
+          "numpy sampler: erf approximation within 1e-6")
+
+    small = CodeLM(vocab=256, dim=32, depth=2, heads=2, ctx=64, pos="rope",
+                   dropout=0.0).eval()
+    cfg = dict(vocab=256, dim=32, depth=2, heads=2, ctx=64, pos="rope", dropout=0.0)
+    with tempfile.TemporaryDirectory() as tmp:
+        ck = os.path.join(tmp, "m.pt")
+        torch.save({"state_dict": small.state_dict(), "config": cfg}, ck)
+        seq = torch.randint(0, 256, (2, 20))
+        with torch.no_grad():
+            ref = small(seq).numpy()
+        prompts = [b"def f(x):\n    return ", b"for i in range(3):\n    "]
+        ref_bytes = generate_torch(small, prompts, 8)
+        for int8 in (False, True):
+            npz = os.path.join(tmp, f"m{int8}.npz")
+            export(ck, npz, int8=int8)
+            lm = NumpyLM(npz)
+            diff = float(abs(ref - lm.logits(seq.numpy())).max())
+            if int8:
+                check(diff < 0.5, f"numpy sampler: int8 logits near torch ({diff:.1e})")
+            else:
+                check(diff < 1e-4, f"numpy sampler: fp32 logits match torch ({diff:.1e})")
+            check(lm.generate(prompts, 8) == ref_bytes,
+                  f"numpy sampler: int8={int8} reproduces torch's greedy bytes")
 
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,

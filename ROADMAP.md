@@ -407,24 +407,21 @@ gate and a kill, and every number comes from `tools/` on this device.
    checks that no task prompt occurs in the training bytes and that the 12
    held-out files are actually held out; `--selftest` and `--verify` are in
    the smoke tests. *Gate: the sha verifies and every solution passes.*
-3. **The code model under a fixed token budget (running).** The baseline is
-   385 k parameters and 1.2 M tokens; two things could explain 0/40. The
-   first arm therefore holds the tokens fixed and quadruples capacity (dim
-   128, depth 6, ~1.5 M parameters, checkpoints at 600 and 1,200 steps). If
-   that does not move the number, a second arm gives the 385 k model 3× the
-   tokens. *Gate: body-compile on ≥ 4 of 40 or pass@1 > 0 on the frozen set.*
-   *Kill: neither arm moves either metric — then the byte model is a
-   completion toy at this budget and the conditional step (5) is cut.*
-4. **Fast sampling.** The current loop recomputes the whole window per byte;
-   add a KV cache and torch int8 dynamic quantization, measure bytes/s and the
-   bits/byte cost. *Gate: ≥ 1 kB/s single-thread at ≤ 1% bits/byte regression,
-   ≤ 25 MB on disk.* *Kill: quantization costs > 3% — then keep fp32 and shrink
-   the model instead.*
-5. **Conditional code.** Fine-tune on (docstring, function, test) triples from
-   the training files only; measure pass@1 on step 2's tests, greedy and
-   temperature 0.8. *Gate: pass@1 > 0 on ≥ 5 of 40, and above a
-   "copy the longest training function" control.* *Kill: pass@1 = 0 — the
-   model stays a completion model and step 9 becomes "complete this line".*
+3. **The code model under a fixed token budget (done, negative).** Two arms:
+   1.26 M parameters at the baseline's 1.2 M tokens, and the 385 k model at 3×
+   the tokens (3.7 M). Bits/byte falls on both — 2.478 → 2.296 and 2.156 — but
+   no body compiles and no test passes. *Gate missed on both metrics.*
+   *Kill triggered: the byte model is a completion model at this budget, and
+   step 5 is cut.*
+4. **Fast sampling (done).** A KV cache takes the 385 k model from 87 to
+   737 B/s in torch; the same weights decoded in numpy reach 1,075 B/s on one
+   stream (2,032 B/s over four) with logits matching torch to 6e-6 and the same
+   greedy bytes on all 44 prompts. *Gate met: 1,075 B/s, +0.02% bits/byte,
+   0.42 MB on disk.*
+5. ~~Conditional code.~~ **Cut by step 3's kill, as pre-registered.** The
+   40-task pass@1 stays in the eval set as the record of what the byte model
+   cannot do; it is not retried at a slightly larger size without a new,
+   separately pre-registered plan (see "What would change the plan").
 6. **The drawing generator.** Two candidates on the same held-out drawings:
    the GNN's masked-fill loop (8 and 16 passes), and an AR patch-token
    decoder at matched parameters. Score masked MSE, r, and seconds per
@@ -433,19 +430,20 @@ gate and a kill, and every number comes from `tools/` on this device.
    reconstruction, not generation, and the page says so.*
 7. **One trunk, two alphabets.** A single decoder-only transformer with a byte
    embedding and a patch embedding, geometry bias only in the patch attention
-   (R0's lesson: geometry is a query prior). Matched-parameter control: the
-   same code model and image model trained separately, same total parameters
-   and tokens. *Gate: the shared trunk is within 3% bits/byte and 10% image
-   MSE of the two-model control; otherwise the sharing is not free and gets
-   dropped.*
+   (R0's lesson: geometry is a query prior). With step 5 cut, the code side is
+   scored by bits/byte, not pass@1. Matched-parameter control: the same code
+   model and image model trained separately, same total parameters and tokens.
+   *Gate: the shared trunk is within 3% bits/byte and 10% image MSE of the
+   two-model control; otherwise the sharing is not free and gets dropped.*
 8. **Transfer, pre-registered.** Image-pretrain then code-fine-tune, and the
    reverse, at fixed tokens and parameters, two seeds. Bar: ≥ 2% bits/byte or
    ≥ 5 points compile rate. *Kill: both transfers inside seed noise — publish
    the null and stop selling "multimodal".*
-9. **Conditioning without a chat stack.** Twelve fixed commands split across
-   the two skills ("draw the hub chart", "write a function that returns the
-   mean of a list"), a documented prompt format, and success measured per
-   command. *Gate: ≥ 8/12 correct.* *Kill: ≤ 4/12 — ship completion-only.*
+9. **Conditioning without a chat stack.** Twelve fixed commands, completion
+   style rather than docstring-to-function, split across the two skills ("draw
+   the hub chart", "finish this line: total = sum(...)"), a documented prompt
+   format, and success measured per command. *Gate: ≥ 8/12 correct.* *Kill:
+   ≤ 4/12 — ship completion-only.*
 10. **Ship and decide.** int8 weights ≤ 25 MB, on-device timing, a page with
     samples, the meter table, and the failures. If steps 5 and 6 stay at their
     floors, keep the meter and the negative result, and stop — the point of
@@ -536,6 +534,88 @@ change to any number that was measured.
 
 Per the pre-registered rule, tokens are next: the 385 k model at 3,600 steps.
 
+### Step 3, second arm and the decision
+
+`tools/code_budget.py --dim 96 --depth 3 --steps 3600` → 385,120 parameters,
+3,686,400 tokens (two epochs of the corpus), checkpoints every 1,200 steps.
+
+| step | tokens | bits/byte | body compiles (greedy / sampled) | pass@1 |
+|---|---|---|---|---|
+| 1,200 | 1.23 M | 2.409 | 0 / 40 · 0 / 40 | 0 / 40 |
+| 2,400 | 2.46 M | 2.205 | 0 / 40 · 1 / 40 | 0 / 40 |
+| 3,600 | 3.69 M | **2.156** | 0 / 40 · 0 / 40 | 0 / 40 |
+| *arm 1 (1.26 M params, 1.23 M tokens)* | *1.23 M* | *2.296* | *0 / 40 · 0 / 40* | *0 / 40* |
+| *baseline (385 k, 1.23 M tokens)* | *1.23 M* | *2.478* | *0 / 40 · 0 / 40* | *0 / 40* |
+
+The 1,200-step row is not a reproduction check: the cosine schedule spans all
+3,600 steps, so its learning rate at step 1,200 is higher than the baseline's.
+The final number, 2.156, is 13% below the baseline, and arm 1's 2.296 is a
+clean capacity-at-equal-tokens comparison.
+
+Across both arms that is 200 greedy and 200 sampled completions. Exactly one
+sampled completion (2,400 steps, `merge_sorted`) parsed as a function body:
+
+```python
+    # bicteon comport the the defails=None
+
+    def __is__(self):
+        return intext(tambort)
+```
+
+It references an undefined name and fails every test. So: **the model writes
+text that scores better on held-out files and still writes no functions.**
+
+Per the pre-registered kill, conditional code (step 5) is cut. What is closed
+is narrow: *a 0.4-1.3 M-parameter byte model, trained on 1.8 MB of CPython for
+two epochs, does not follow a docstring.* That does not say a code model needs
+to be this small, or that fine-tuning on (docstring, function) pairs could
+never work — only that at this envelope, with this corpus, the cheap version
+is measured and empty.
+
+Why the kill is right rather than impatient: bits/byte is still improving
+(2.478 → 2.156) while the task metric is flat at zero, so more of the same
+compute buys a better language model of Python and not a code assistant. The
+obvious reopen is a single pre-registered ceiling run — 5 M parameters and the
+full ~30 MB `Lib/` corpus, several hours of CPU — with the same 40 tasks and
+the same rule. That is a decision to take deliberately, not by grinding the
+current size.
+
+### Step 4, measured
+
+`tools/fast_sampling.py`, one thread, `OPENBLAS_NUM_THREADS=1
+OMP_NUM_THREADS=1`, 96 new bytes per prompt:
+
+| runtime | 1 stream | 4 streams |
+|---|---|---|
+| torch, full window per byte | 87 B/s | — |
+| torch, KV cache, oneDNN on | — | 445 B/s |
+| torch, KV cache | — | 737 B/s |
+| numpy, KV cache, int8 weights | **1,075 B/s** | **2,032 B/s** (1,464 sampled) |
+
+The floor on this device is dispatch, not arithmetic. A (1, 96) x (96, 288)
+matmul costs 400-1,400 µs through oneDNN and ~24 µs with oneDNN disabled, and
+one cached torch step makes ~230 aten calls. The numpy sampler makes ~230 numpy
+calls at ~2.8 µs each, so the fix is fewer ops: each layer norm's affine is
+folded into the matmul that follows it, rope is one 24x24 matmul per call
+instead of six ufuncs, and the variance reduction is a gemv. That took the same
+weights from 433 to 1,075 B/s. The BLAS thread count is not a detail — with the
+default eight threads every tiny matmul pays a pool wake-up and the loop runs
+at 754 B/s.
+
+int8 dynamic quantization made torch *slower* (232 → 137 B/s): it adds unpacking
+per call while the call overhead dominates. In numpy the weights are
+dequantized once at load, so int8 there is a storage format, not a speed knob.
+
+Equivalence, because a fast sampler that generates different bytes is worthless:
+the fp32 export matches torch's logits to 5.7e-6; the int8 export shifts logits
+by up to 0.08 but produces byte-identical greedy output on the four meter
+prompts and on all 40 frozen tasks; held-out bits/byte moves 2.4777 → 2.4782
+(+0.02%).
+
+Gate: 1,075 >= 1,000 B/s single-thread, +0.02% <= 1%, 0.42 MB <= 25 MB. Met. A
+96-byte completion takes 89 ms; four at once take 47 ms each. That is enough for
+a demo and is not a chat model.
+
 ## Non-goals, stated once
 
 * No OGB/LRGB leaderboard runs. A 405 k model will not be competitive there,
@@ -554,5 +634,8 @@ Per the pre-registered rule, tokens are next: the 385 k model at 3,600 steps.
 * R2 had shown a topology gain → that would have been the paper, with the
   energy head as a side result. It did not: random wiring at matched degree is
   at least as good, so that route is closed rather than pending.
+* A code generator inside this envelope → only via the ceiling run (5 M
+  parameters, the full `Lib/`, the same 40 tasks and rule). R0-R2 and step 3
+  say a small byte model on 1.8 MB will not get there by more steps.
 * What is left is the measured negative result plus the reusable layers. The
   next project starts from the layers, not from the drawings.

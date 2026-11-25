@@ -1,0 +1,1764 @@
+{
+  "config": {
+    "dim": 96,
+    "depth": 3,
+    "heads": 4,
+    "steps": 3600,
+    "ckpt_every": 1200,
+    "batch": 4,
+    "seed": 0,
+    "sample_seeds": [
+      0
+    ],
+    "corpus": "runs/code/corpus.pt",
+    "corpus_src": "/tmp/opencode/cpy/cpython-3.12.0/Lib",
+    "eval_path": "runs/budget/eval.json",
+    "out": "runs/code-budget-3x",
+    "rescore": false
+  },
+  "eval_sha256": "1913f265958b7c9d4327f1e75b2d8f48fc54dfd7af128110980498b4ed452e3a",
+  "params": 385120,
+  "total_tokens": 3686400,
+  "checkpoints": [
+    {
+      "step": 1200,
+      "tokens": 1228800,
+      "train_loss": 0.9174169898033142,
+      "bits_per_byte": 2.4094145969616494,
+      "eval_bytes": 168960,
+      "tasks": {
+        "greedy": {
+          "compile_rate": 0.0,
+          "pass_at_1": 0.0
+        },
+        "sampled": {
+          "compile_rate": 0.0,
+          "pass_at_1": 0.0
+        },
+        "rows": [
+          {
+            "mode": "greedy",
+            "name": "sum_list",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "mean",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport_inite()\n                                                                  "
+          },
+          {
+            "mode": "greedy",
+            "name": "median",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "gcd",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport_inite()\n                                                                  "
+          },
+          {
+            "mode": "greedy",
+            "name": "is_prime",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._string = self._comport_self._string()\n        self._comport_self._string()\n       "
+          },
+          {
+            "mode": "greedy",
+            "name": "factorial",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "fib",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "reverse_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "is_palindrome",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "count_vowels",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "title_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "flatten",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "unique",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport_inite()\n                                                                  "
+          },
+          {
+            "mode": "greedy",
+            "name": "chunk",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "rle",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "caesar",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "word_count",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "is_anagram",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "dot",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "transpose",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport_inite()\n                                                                  "
+          },
+          {
+            "mode": "greedy",
+            "name": "clamp",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "sign",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "binary_search",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "merge_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "rotate",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "cumsum",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport_inget_____________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "variance",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "mode",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "parse_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "join_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "fizzbuzz",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "collatz_len",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "celsius_to_f",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport_self._string()\n        self._comport_self._string()\n        self._comport_"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport_inite()\n                                                                  "
+          },
+          {
+            "mode": "greedy",
+            "name": "min_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "count_char",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "capitalize_first",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "rolling_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "bin_to_dec",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "greedy",
+            "name": "is_leap",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "sum_list",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "mean",
+            "compiles": false,
+            "passes": false,
+            "generated": "\n        mesig_parch_loakeret = 'H'\n        path self._dack = return self.whehing(names):\n      "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "median",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._clais = (\"Contenting in it from not fuld\n        if is if not the self.files(extex"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "gcd",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.self._intame(comports)\n        ext = sys._pon(\"%dodactor_pect()\n        else:\n     "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_prime",
+            "compiles": false,
+            "passes": false,
+            "generated": "        low = 'Sexcode')\n        if in funces a sem = _reprem = P IGST str(becode)\n        self."
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "factorial",
+            "compiles": false,
+            "passes": false,
+            "generated": "    if lie a comport moduleE_rame(self, mestancii):\n        excall = 'to bild module contime is "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "fib",
+            "compiles": false,
+            "passes": false,
+            "generated": "                          # Lookie\n                                                             "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "reverse_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "        if is funced = None, self.prom in self._loots = True\n        main += T wher.therr(from i"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_palindrome",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # None:\n                                                                                "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "count_vowels",
+            "compiles": false,
+            "passes": false,
+            "generated": "            if malue wilting or Type\n        if to next = loate = The\n        excent deffix = I "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "title_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "    \"\"\"\"\n\n            \"\"\"\n            if not next = dace\n        if not is not on self._is not f"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "flatten",
+            "compiles": false,
+            "passes": false,
+            "generated": "               self._cape_to = True\n        self._proade(self, self._fin_stroutorke('noded'))\n  "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "unique",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.eadd_wath_not()\n\n        except = loame\n    if not ould buncted as None:\n        if"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "chunk",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.wrides = Thass code is is not texcold.\n        \"\"\"\n        if or prame. Sthe Try:\n "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rle",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "caesar",
+            "compiles": false,
+            "passes": false,
+            "generated": "        if name = sources\n            self._dop.ext_file_ser_string(\"context_not == not = ment_s"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "word_count",
+            "compiles": false,
+            "passes": false,
+            "generated": "                     if module.apport(allh)\n        if self._tendedse(\"in un or om asse is loab "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_anagram",
+            "compiles": false,
+            "passes": false,
+            "generated": "    def hend_path():\n        for node.restring exces\n        \"\"\"\n        self._coded_startects i"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "dot",
+            "compiles": false,
+            "passes": false,
+            "generated": "            if letanch from compress and lowexchars lobjent en coplocanage.                     "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "transpose",
+            "compiles": false,
+            "passes": false,
+            "generated": "            self._fined(node)\n        self._bockename(node):\n        comproload be is cold nemen"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "clamp",
+            "compiles": false,
+            "passes": false,
+            "generated": "        if oult - is node:\n        self._objecode(self, reakey, contexts)\n\n    def petcommatimes"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "sign",
+            "compiles": false,
+            "passes": false,
+            "generated": "            if parch = Candstatting is of chat to None:\n        # Che stris by is not is None\n  "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "binary_search",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.iname_to None:\n            return subnce = if chars None\n        if not to to in no"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "merge_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "    return prout in restime is used\n\n    resuld = self.get(self):\n            return of asg._and"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rotate",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.hose.comporting(self, dame=None, in remethater)\n        self.file_cool_wokiter()\n  "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "cumsum",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.losermall = in from to else:\n            if self._self._parte(self, context, *kis m"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "variance",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.wreaup(comports)\n        self._corsime(\".powich and main\n            if not = Tystr"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "mode",
+            "compiles": false,
+            "passes": false,
+            "generated": "        if porthis for is lime(node\n        # lose is module be in os.\n    \"\"\"\n    return is mod"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "parse_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.chars = Return mistion form path with mesant hours it is used if comping om is is i"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "join_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # doc.  to imple if not cont undere the self.writer is the None:\n            return = se"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "fizzbuzz",
+            "compiles": false,
+            "passes": false,
+            "generated": "                                                                                                "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "collatz_len",
+            "compiles": false,
+            "passes": false,
+            "generated": "    if nament to import\n\n    if is Fult None\n\n\n        if not paine _pack_in = 0\n               "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "celsius_to_f",
+            "compiles": false,
+            "passes": false,
+            "generated": "    def is not import on not not the dis a nowe is to bif compler()\n        self.stdeat_from = d"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "                # Bis the firs noded be raise argor the and self.wright\n        if not is None:\n"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "min_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        except = marss[cantry='%se':\n                                                           "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "count_char",
+            "compiles": false,
+            "passes": false,
+            "generated": "    def the self._class = os.get_prockien = self.return os sept.dind(rags):\n        self._lener."
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "capitalize_first",
+            "compiles": false,
+            "passes": false,
+            "generated": "    #  = resultion in to the finct for is for cure in None\n        if not hent in self.encoded\n "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rolling_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        return if module hast on sublloop by de a thout a lock in for is node. At rencode):\n    "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "bin_to_dec",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._compation__import(figg)\n    def self._strim_callocs = self.extename_propating = 1\n"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_leap",
+            "compiles": false,
+            "passes": false,
+            "generated": "        parcin objections in all propich\n    if call pettoname(self):\n            self._wid_hild"
+          }
+        ]
+      },
+      "seconds": 710.8
+    },
+    {
+      "step": 2400,
+      "tokens": 2457600,
+      "train_loss": 1.0638389587402344,
+      "bits_per_byte": 2.2054339911842957,
+      "eval_bytes": 168960,
+      "tasks": {
+        "greedy": {
+          "compile_rate": 0.0,
+          "pass_at_1": 0.0
+        },
+        "sampled": {
+          "compile_rate": 0.025,
+          "pass_at_1": 0.0
+        },
+        "rows": [
+          {
+            "mode": "greedy",
+            "name": "sum_list",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # The string the the the the the the the the the the and the the the the the"
+          },
+          {
+            "mode": "greedy",
+            "name": "mean",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "median",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "gcd",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_prime",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "factorial",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "fib",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        #  The self._compressage is not the the the and the the and the the the and "
+          },
+          {
+            "mode": "greedy",
+            "name": "reverse_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._compressage = self._compressage._path()\n        self._compressage_state___________"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_palindrome",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "count_vowels",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # The self._compressate is the compress the the the and the the the the the "
+          },
+          {
+            "mode": "greedy",
+            "name": "title_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "flatten",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "unique",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "chunk",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # The self._compressage is the string the the the the the and the the the th"
+          },
+          {
+            "mode": "greedy",
+            "name": "rle",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # The self._compressage is the string the the the the the and the the the th"
+          },
+          {
+            "mode": "greedy",
+            "name": "caesar",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._compressage = self._path__________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "word_count",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._compressage = self._path__________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_anagram",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "dot",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "transpose",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "clamp",
+            "compiles": false,
+            "passes": false,
+            "generated": "        #  The self._comport is not the the the the the the and the the the the and the the the "
+          },
+          {
+            "mode": "greedy",
+            "name": "sign",
+            "compiles": false,
+            "passes": false,
+            "generated": "        #  The self._comport is not the the the the the the the the the the the and the the the "
+          },
+          {
+            "mode": "greedy",
+            "name": "binary_search",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # The self._compressage is the string the the the the the and the the the th"
+          },
+          {
+            "mode": "greedy",
+            "name": "merge_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "rotate",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "cumsum",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # a string the the the the the the the the the the the the the the the the the the the t"
+          },
+          {
+            "mode": "greedy",
+            "name": "variance",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "mode",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state__ = self._state_____________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "parse_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._set_transport is not the the the the the the the the the the the and the the the t"
+          },
+          {
+            "mode": "greedy",
+            "name": "join_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "fizzbuzz",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # The self._compressage is the string the the the the the and the the the th"
+          },
+          {
+            "mode": "greedy",
+            "name": "collatz_len",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # The self._compressage is the string the the the the the and the the the th"
+          },
+          {
+            "mode": "greedy",
+            "name": "celsius_to_f",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "min_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "count_char",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state___ = self.__________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "capitalize_first",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state__ = self.___________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "rolling_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        #  The self._comport is not the the the the the the and the the the the and "
+          },
+          {
+            "mode": "greedy",
+            "name": "bin_to_dec",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # the self._compressage is the string the the the the the the the the and the the the th"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_leap",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._state_________________________________________________________________"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "sum_list",
+            "compiles": false,
+            "passes": false,
+            "generated": "    #\n# Implemementry:\n        \"\"\"\n    #\n    The return encoded to and the prespece subles that "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "mean",
+            "compiles": false,
+            "passes": false,
+            "generated": "\n    Return Chandler the for is not speceds.     \"\"\"\n            if self._fase_notment(self, sta"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "median",
+            "compiles": false,
+            "passes": false,
+            "generated": "        not the band header typessation liter with is not doustated to the cance to specation a "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "gcd",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._resport_inite.get_context.stributiple stranses in the main cher and to"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_prime",
+            "compiles": false,
+            "passes": false,
+            "generated": "\n\n\n# comprotocal(bail._dict(compling.state):\n        \"\"\"\n        if the marter commatchandled se"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "factorial",
+            "compiles": false,
+            "passes": false,
+            "generated": "    \"\"\"\n\n# The deflanation args the and waindlen pace inting of state be instand import None\n   "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "fib",
+            "compiles": false,
+            "passes": false,
+            "generated": "        The all the return the as a module be strict.\n\n        The stated as of all time class a"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "reverse_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "        chas be stricter, try or all be the read the maring is not object extep instribution com"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_palindrome",
+            "compiles": false,
+            "passes": false,
+            "generated": "                raise False\n            return self.set_socket()\n        self._intemation the re"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "count_vowels",
+            "compiles": false,
+            "passes": false,
+            "generated": "        targidat = path sources.ure.\n        The reference = westates.class()\n        \"\"\"Reambat"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "title_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "    if context shout to the sopting the recodes to lecomport lester instance pecoded to be starc"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "flatten",
+            "compiles": false,
+            "passes": false,
+            "generated": "        next = _Path = Type\n        try:\n            for this not not to the unncoder the object"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "unique",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        if encode the states the for in the ressage report struture\n        return a"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "chunk",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # Stable if the is the encoded a let by erser of or possibut be default self.write and i"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rle",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        def attrog_reader()\n        if not _headlers = trame.addend():\n        \"\"\"Se"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "caesar",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # chen for self._state\n        self.he value._strict(self, data)\n        if def set_cook"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "word_count",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.compler and a for is not used workes.\n\n        \"\"\"\n        The comparation instance"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_anagram",
+            "compiles": false,
+            "passes": false,
+            "generated": "    # muple read ase that a be stricter string be sead mode path the def test of specess the int"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "dot",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        module = Type\n        buturress:\n            pain ithed\n        # ares mata "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "transpose",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # Initer self._mal_charser contrans the deead sether args[0]]\n        # Sump"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "clamp",
+            "compiles": false,
+            "passes": false,
+            "generated": "        if for self.starte()\n        we handled commentite for the cookies the processlat is wil"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "sign",
+            "compiles": false,
+            "passes": false,
+            "generated": "    # the to the paramed bytes formatch as return can of not string\n        indent = None\n      "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "binary_search",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # None and wath as result excet.        # Intermor only a domac or taile is for in state"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "merge_sorted",
+            "compiles": true,
+            "passes": false,
+            "generated": "    # bicteon comport the the defails=None\n\n    def __is__(self):\n        return intext(tambort)"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rotate",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # Starte handle context, excepted_ending, exceptern_not map the and to imples.\n        r"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "cumsum",
+            "compiles": false,
+            "passes": false,
+            "generated": "    Chopeset be starn the ep interto stranger of the data.\n    \"\"\"\n    prite by message.\n\n\n# Pat"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "variance",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # port a dicted is maxssage to be defaultach instances in the commail is muthon of whars"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "mode",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # with closs in cant ba command the farlize is for a be to that impretor\n        self.el"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "parse_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # contimed warget is of is flomath is in and the cooking symbe are mull wich cookie the "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "join_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # Fall instally extribution new.  If the for be of the all ging a regeter compath\n      "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "fizzbuzz",
+            "compiles": false,
+            "passes": false,
+            "generated": "    for = Return self.path_pathon(self, moder)\n\n    def __string(self):\n        elif compler(f):"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "collatz_len",
+            "compiles": false,
+            "passes": false,
+            "generated": "    \"\"\"\n\n    socket = None\n\ndef __lost__(file_handler, thatd):\n        and self._readirs from is"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "celsius_to_f",
+            "compiles": false,
+            "passes": false,
+            "generated": "    If isticts(self):\n        return is not arget file for format tead a detates.\n        self.d"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "    if self._reads_state_(stext, and station_file._patherent(__tome.state)\n     def _____(self, "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "min_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        elif self._inteminterversion() and ressed to and the path return noderator\n        tasta"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "count_char",
+            "compiles": false,
+            "passes": false,
+            "generated": "    # Python the the the end for the trais a be are the parts[0] and process the format is a ref"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "capitalize_first",
+            "compiles": false,
+            "passes": false,
+            "generated": "    if string treamed a sexts is not sockeyes.\n\n    elif not is not headers message at a string "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rolling_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        part = self._text\n        start(self)\n            try:\n            return while meaded t"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "bin_to_dec",
+            "compiles": false,
+            "passes": false,
+            "generated": "    table = filename = mapport()\n    self._time___('__parsed', 'b')\n\n    def restring():\n    ret"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_leap",
+            "compiles": false,
+            "passes": false,
+            "generated": "        for a result proted interal and wertemental exack is the return\n        return path clos"
+          }
+        ]
+      },
+      "seconds": 1423.0
+    },
+    {
+      "step": 3600,
+      "tokens": 3686400,
+      "train_loss": 1.5678716897964478,
+      "bits_per_byte": 2.155931961926606,
+      "eval_bytes": 168960,
+      "tasks": {
+        "greedy": {
+          "compile_rate": 0.0,
+          "pass_at_1": 0.0
+        },
+        "sampled": {
+          "compile_rate": 0.0,
+          "pass_at_1": 0.0
+        },
+        "rows": [
+          {
+            "mode": "greedy",
+            "name": "sum_list",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state = self._comport()\n        self._state_______________________(self, self._con"
+          },
+          {
+            "mode": "greedy",
+            "name": "mean",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n            self._comport = self._comport()\n"
+          },
+          {
+            "mode": "greedy",
+            "name": "median",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n        self._compress = self._comport()\n   "
+          },
+          {
+            "mode": "greedy",
+            "name": "gcd",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_prime",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport(self, self._compr"
+          },
+          {
+            "mode": "greedy",
+            "name": "factorial",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n            self._compressage = self._compor"
+          },
+          {
+            "mode": "greedy",
+            "name": "fib",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._context()\n            self._context()\n            self._context()\n                "
+          },
+          {
+            "mode": "greedy",
+            "name": "reverse_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._compress = self._comport()\n        self._compress = self._comport()\n        self._"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_palindrome",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._compile_comport = self._comport()\n        self._compress = self._comport()\n       "
+          },
+          {
+            "mode": "greedy",
+            "name": "count_vowels",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "title_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n        self._compress = self._comport()\n   "
+          },
+          {
+            "mode": "greedy",
+            "name": "flatten",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._state_____________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "unique",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "chunk",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "rle",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "caesar",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "word_count",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_anagram",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._s"
+          },
+          {
+            "mode": "greedy",
+            "name": "dot",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n        self._compress = self._comport()\n   "
+          },
+          {
+            "mode": "greedy",
+            "name": "transpose",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "clamp",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n            self._comport = self._comport()\n"
+          },
+          {
+            "mode": "greedy",
+            "name": "sign",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n            self._compressage = self._compor"
+          },
+          {
+            "mode": "greedy",
+            "name": "binary_search",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._context = self._comport()\n        self._context(self, self._context, self._context"
+          },
+          {
+            "mode": "greedy",
+            "name": "merge_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "rotate",
+            "compiles": false,
+            "passes": false,
+            "generated": "\n    def _______________________________________________________________________________________"
+          },
+          {
+            "mode": "greedy",
+            "name": "cumsum",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "variance",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n        self._compress = self._comport()\n   "
+          },
+          {
+            "mode": "greedy",
+            "name": "mode",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._comport = self._comport()\n        self._co"
+          },
+          {
+            "mode": "greedy",
+            "name": "parse_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport(self, self._compr"
+          },
+          {
+            "mode": "greedy",
+            "name": "join_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport(self, self._compr"
+          },
+          {
+            "mode": "greedy",
+            "name": "fizzbuzz",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._context = self._comport()\n        self._context(self, self._context, s"
+          },
+          {
+            "mode": "greedy",
+            "name": "collatz_len",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._context = self._comport()\n        self._compress = self._comport()\n   "
+          },
+          {
+            "mode": "greedy",
+            "name": "celsius_to_f",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport(self, self._compr"
+          },
+          {
+            "mode": "greedy",
+            "name": "is_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport(self, self._compr"
+          },
+          {
+            "mode": "greedy",
+            "name": "min_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._set_comport(self, self._compressage)\n        self._compress = self._co"
+          },
+          {
+            "mode": "greedy",
+            "name": "count_char",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "capitalize_first",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._comport = self._comport()\n        self._compress = self._comport()\n        self._c"
+          },
+          {
+            "mode": "greedy",
+            "name": "rolling_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n            self._comport = self._comport()\n"
+          },
+          {
+            "mode": "greedy",
+            "name": "bin_to_dec",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._set_comport()\n        self._compress = self._comport(self, self._compressage)\n    "
+          },
+          {
+            "mode": "greedy",
+            "name": "is_leap",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._comport = self._comport()\n            self._compressage = self._compor"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "sum_list",
+            "compiles": false,
+            "passes": false,
+            "generated": "    # Interror a mal lock result.\n\n# This uncricter modules commandle\n\n    # In be cookie is a c"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "mean",
+            "compiles": false,
+            "passes": false,
+            "generated": "\n    make is None:\n    if self.imports() _docket_intert(self.write):\n        \"\"\"\n        return "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "median",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._class\n    \"\"\"\n        if not None:\n            text = self._astr(self)\n        wit"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "gcd",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self._bytess = domains()\n\n        self._complen('recodec.codectoriput\n        return sel"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_prime",
+            "compiles": false,
+            "passes": false,
+            "generated": "\n\n# Intext_ascharser(extext, main, self.path_last)\n\n\nclass HADLPOMO_MERT, process an and of the "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "factorial",
+            "compiles": false,
+            "passes": false,
+            "generated": "    \"\"\"\n\n# The osem the for pass on and by mults poled a the for the one conted and the for path"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "fib",
+            "compiles": false,
+            "passes": false,
+            "generated": "        else:\n                    raise False\n        self._charts = re.conver(name)\n           "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "reverse_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "        Impremented ending\n        try:\n            loggh = self.det_ocking_inary_(name)\n\n    de"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_palindrome",
+            "compiles": false,
+            "passes": false,
+            "generated": "        # If flevisit\n            try:\n                    # a sys.pencate(for fletable)\n       "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "count_vowels",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.__handled__socket_close()\n            process.child_andler.compare_replit(self)\n\n  "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "title_words",
+            "compiles": false,
+            "passes": false,
+            "generated": "    return list('ACEITIONETE\"\"))\n    def dot = self.__base_stres[1]:\n        else:\n        retur"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "flatten",
+            "compiles": false,
+            "passes": false,
+            "generated": "        attry:\n            return None\n\n        process = gine.comple() bytes the for getator un"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "unique",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.threader, and to a value bout the instance charset done. \" \"\"\"\n            return f"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "chunk",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        # False reader as propens. as in not new_offset = socket in of encode(\n     "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rle",
+            "compiles": false,
+            "passes": false,
+            "generated": "    Locking comparame input mand in None\n# assize done from arging. ('achtion \"\"\"\n    return res"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "caesar",
+            "compiles": false,
+            "passes": false,
+            "generated": "        return exception in contantal\n\n        def write = dita(chardler, node, found=self, code"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "word_count",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.compattent(self, is name, string)\n        if self._sype():\n        \"\"Repecess\n\n\n   "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_anagram",
+            "compiles": false,
+            "passes": false,
+            "generated": "    \"\"\"\n    return True is name = string.input(text)\n\n#  to main the for the sourd with in for a"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "dot",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        self._contain = 1 \\t\\rd.ncline(callbox, betourn thas, process=None, if and)\n"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "transpose",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        if not string = end\n            return lines = True\n\n    def method as messa"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "clamp",
+            "compiles": false,
+            "passes": false,
+            "generated": "    \"\"\"\n        \"\"\"\n\n    def __namess____ = True\n\n    def compile is as context self._thandled i"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "sign",
+            "compiles": false,
+            "passes": false,
+            "generated": "    # abchan the for pasks or argument casie the new the be chare a for the module wail entroup "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "binary_search",
+            "compiles": false,
+            "passes": false,
+            "generated": "        \"\"\"\n        The from the cheadshange the the comported the the encoding filed look a the"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "merge_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "    def encode(self._contain_offser):\n        \"\"\"\n        return self._bytes(self)\n        retur"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rotate",
+            "compiles": false,
+            "passes": false,
+            "generated": "\n        return self._close(self, *indow='atchor', 'sent')\n        self.tream_sockie_path_(\"ou ="
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "cumsum",
+            "compiles": false,
+            "passes": false,
+            "generated": "    Chook:\n        raise for are to os.\n        Return self._respons the intert whild file sting"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "variance",
+            "compiles": false,
+            "passes": false,
+            "generated": "        self.repremin self._ith()\n            # attres in context and the buffer function the fo"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "mode",
+            "compiles": false,
+            "passes": false,
+            "generated": "    # for lead objects the suped context not is and the be stricter can news, pass\n    if not in"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "parse_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "                    # return format\n\n            self._data(self, module)\n        return self._f"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "join_ints",
+            "compiles": false,
+            "passes": false,
+            "generated": "            raise OSTE userver exceptions in the comport of the dite value the the is not the di"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "fizzbuzz",
+            "compiles": false,
+            "passes": false,
+            "generated": "    asse = max max = digename, digest={f['])\n    return compare all start the uturn line bytes b"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "collatz_len",
+            "compiles": false,
+            "passes": false,
+            "generated": "    # start for the prefor string is is ovent and commatime file.\n\n    File = _filename(self):\n "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "celsius_to_f",
+            "compiles": false,
+            "passes": false,
+            "generated": "    def _herefix(self, compile_path_presslages)\n\n    def inntral(self):\n        \"\"\"Seare \"atched"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_sorted",
+            "compiles": false,
+            "passes": false,
+            "generated": "    if self._fileose(self._pid):\n            raise Messlobjectiones of untext of the stricter fo"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "min_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "            return partes = line\n\n\ndef _write(lself, callbackage):\n        \"\"\"Context\"\" \"nowing "
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "count_char",
+            "compiles": false,
+            "passes": false,
+            "generated": "    def the codecs of is modules and as export by chare over cookie value end result the policat"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "capitalize_first",
+            "compiles": false,
+            "passes": false,
+            "generated": "    This context message to be dicmport has wat the handler of exception it event of state strin"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "rolling_max",
+            "compiles": false,
+            "passes": false,
+            "generated": "        not the encoder the serval a duffers.\n        \"\"\"\n        for is None:\n            self."
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "bin_to_dec",
+            "compiles": false,
+            "passes": false,
+            "generated": "    Return Streaming_cookie(self, piperent, *args) to name + as hand object the and in to path f"
+          },
+          {
+            "mode": "sample t=0.8",
+            "name": "is_leap",
+            "compiles": false,
+            "passes": false,
+            "generated": "        pathern the byte with self._read\n        \"\"\"\n        self._state_inform(\"state formay an"
+          }
+        ]
+      },
+      "seconds": 2142.1
+    }
+  ]
+}

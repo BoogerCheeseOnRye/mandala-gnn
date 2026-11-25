@@ -39,9 +39,10 @@ class RoPE(nn.Module):
         self.register_buffer("cos", f.cos(), persistent=False)
         self.register_buffer("sin", f.sin(), persistent=False)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:   # (B, H, L, dh)
-        n = x.shape[2]
-        c, s = self.cos[:n][None, None], self.sin[:n][None, None]
+    def forward(self, x: torch.Tensor, offset: int = 0) -> torch.Tensor:
+        n = x.shape[2]                                    # (B, H, L, dh)
+        c = self.cos[offset:offset + n][None, None]
+        s = self.sin[offset:offset + n][None, None]
         x1, x2 = x[..., 0::2], x[..., 1::2]
         return torch.stack([x1 * c - x2 * s, x1 * s + x2 * c], -1).flatten(-2)
 
@@ -89,6 +90,30 @@ class Block(nn.Module):
         x = x + self.out(a.transpose(1, 2).reshape(b, n, -1))
         return x + self.ff(self.ln2(x))
 
+    def forward_cached(self, x: torch.Tensor, past, offset: int):
+        """One or more new tokens against a (k, v) cache. Returns x and the new cache."""
+        b, n, _ = x.shape
+        q, k, v = self.qkv(self.ln1(x)).view(b, n, 3, self.heads, self.dh).permute(2, 0, 3, 1, 4)
+        if self.rope is not None:
+            q, k = self.rope(q, offset), self.rope(k, offset)
+        if past is not None:
+            k = torch.cat([past[0], k], dim=2)
+            v = torch.cat([past[1], v], dim=2)
+        if n == 1 and past is not None:
+            attn_mask = None
+        else:
+            total = k.shape[2]
+            mask = torch.zeros(n, total, device=x.device, dtype=x.dtype)
+            mask[:, total - n:] = torch.triu(
+                torch.full((n, n), float("-inf"), device=x.device, dtype=x.dtype),
+                diagonal=1)
+            attn_mask = mask[None, None]
+        a = F.scaled_dot_product_attention(
+            q, k, v, attn_mask=attn_mask,
+            dropout_p=self.drop if self.training else 0.0)
+        x = x + self.out(a.transpose(1, 2).reshape(b, n, -1))
+        return x + self.ff(self.ln2(x)), (k, v)
+
 
 class CodeLM(nn.Module):
     def __init__(self, vocab: int = 256, dim: int = 96, depth: int = 3,
@@ -122,6 +147,27 @@ class CodeLM(nn.Module):
         for block in self.blocks:
             x = block(x, feats, mask)
         return self.head(self.ln_f(x))
+
+    def forward_cached(self, idx: torch.Tensor, cache=None):
+        """Incremental forward: (B, n) new tokens plus a list of (k, v) per block.
+
+        Returns the logits for the new tokens and the updated cache. Positions
+        come from the cache length, so the result matches the full forward.
+        """
+        assert self.pos in ("rope", "abs"), "cached decoding is only wired for rope/abs"
+        b, n = idx.shape
+        offset = 0 if cache is None else cache[0][0].shape[2]
+        x = self.tok(idx)
+        if self.pos == "abs":
+            pos = torch.arange(offset, offset + n, device=idx.device)
+            x = x + self.pos1d(pos)[None]
+        x = self.drop(x)
+        new = []
+        for i, block in enumerate(self.blocks):
+            past = None if cache is None else cache[i]
+            x, kv = block.forward_cached(x, past, offset)
+            new.append(kv)
+        return self.head(self.ln_f(x)), new
 
     def n_params(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)

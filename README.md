@@ -249,8 +249,12 @@ when asked to draw from an empty canvas, against 0.287 for a constant image.
 Step 2 froze the scoreboard: 40 hand-written docstring tasks with unit tests and
 36 held-out drawings, under one SHA. On those tasks the same model compiles a
 real function body on 0 of 40 (a naive `compile()` says 40 of 40, because
-whitespace is valid Python) and passes 0 of 40. Those are the numbers later
-steps have to beat.
+whitespace is valid Python) and passes 0 of 40. Step 3 tried capacity (1.26 M
+parameters) and 3x the tokens: bits/byte fell 2.478 → 2.156, the task metric
+stayed at 0, so the pre-registered kill cut conditional code. Step 4 got
+generation to 1,075 B/s on one stream (2,032 over four) by decoding the same
+weights in numpy, with identical greedy bytes on all 44 prompts and 0.42 MB on
+disk. Those are the numbers later steps have to beat.
 
 ## What this is not
 

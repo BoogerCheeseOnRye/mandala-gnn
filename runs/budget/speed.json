@@ -1,0 +1,82 @@
+{
+  "checkpoint": "runs/budget/code-rope.pt",
+  "params": 385120,
+  "eval_sha256": "1913f265958b7c9d4327f1e75b2d8f48fc54dfd7af128110980498b4ed452e3a",
+  "equivalence": {
+    "fp32_max_abs_logit_diff": 5.7220458984375e-06,
+    "int8_max_abs_logit_diff": 0.0835881233215332,
+    "greedy_4_prompts_identical": true,
+    "greedy_40_tasks_identical": true,
+    "n_prompts": 96
+  },
+  "speed_bytes_per_s": {
+    "torch_full_recompute": {
+      "median": 87.02498425123854,
+      "runs": [
+        84.94211005870825,
+        87.02498425123854,
+        87.5977878915117
+      ]
+    },
+    "torch_cached_mkldnn": {
+      "median": 445.01949721413763,
+      "runs": [
+        445.01949721413763,
+        441.54359402122964,
+        448.87933590518793
+      ]
+    },
+    "torch_cached": {
+      "median": 737.3681901954893,
+      "runs": [
+        744.7302827142305,
+        737.3681901954893,
+        733.4820305408888
+      ]
+    },
+    "numpy_4_streams": {
+      "median": 2031.7320359740343,
+      "runs": [
+        2031.7320359740343,
+        2069.873975292773,
+        1938.9950746842244
+      ]
+    },
+    "numpy_4_streams_sampled": {
+      "median": 1463.6915027976431,
+      "runs": [
+        1462.9056163552773,
+        1463.6915027976431,
+        1469.9358778919295
+      ]
+    },
+    "numpy_1_stream": {
+      "median": 1075.4783714793234,
+      "runs": [
+        1041.676669623774,
+        1075.4783714793234,
+        1086.9437099715792
+      ]
+    }
+  },
+  "bits_per_byte": {
+    "fp32": 2.477658626015783,
+    "int8": 2.4781545375335314,
+    "delta": 0.0002001532868738089,
+    "val_bytes": 168960
+  },
+  "size_mb": {
+    "fp32_mb": 1.551438,
+    "npz_int8_mb": 0.424176
+  },
+  "threads": {
+    "torch": 1,
+    "openblas": "1",
+    "omp": "1"
+  },
+  "gate": {
+    "speed_ok": true,
+    "bpb_ok": true,
+    "size_ok": true
+  }
+}
