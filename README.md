@@ -254,7 +254,14 @@ parameters) and 3x the tokens: bits/byte fell 2.478 → 2.156, the task metric
 stayed at 0, so the pre-registered kill cut conditional code. Step 4 got
 generation to 1,075 B/s on one stream (2,032 over four) by decoding the same
 weights in numpy, with identical greedy bytes on all 44 prompts and 0.42 MB on
-disk. Those are the numbers later steps have to beat.
+disk. Step 6 asked two candidates to draw the 36 held-out drawings from an empty
+canvas against a mean-image floor and a representation ceiling (the drawing's own
+patches through the same renderer): the GNN's fill loop reaches 0.55x the floor
+— 60% of the gain the patch representation allows — in 0.48 s, and an AR patch
+decoder 0.81x (25%) in 0.36 s. Both missed the pre-registered 2x gate, so no
+generator is claimed; the missing 40% is per-cell prediction quality, since
+revealing the true patches after every pass changes nothing. Those are the
+numbers later steps have to beat.
 
 ## What this is not
 

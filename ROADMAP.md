@@ -422,12 +422,15 @@ gate and a kill, and every number comes from `tools/` on this device.
    40-task pass@1 stays in the eval set as the record of what the byte model
    cannot do; it is not retried at a slightly larger size without a new,
    separately pre-registered plan (see "What would change the plan").
-6. **The drawing generator.** Two candidates on the same held-out drawings:
-   the GNN's masked-fill loop (8 and 16 passes), and an AR patch-token
-   decoder at matched parameters. Score masked MSE, r, and seconds per
-   drawing against the constant-image floor. *Gate: beats the floor by 2× MSE
-   and finishes in ≤ 2 s.* *Kill: both at the floor — then "images" means
-   reconstruction, not generation, and the page says so.*
+6. **The drawing generator (done, gate missed by both).** Two candidates on the
+   same held-out drawings: the GNN's masked-fill loop (8 and 16 passes), and an
+   AR patch-token decoder at matched parameters. Score masked MSE, r, and
+   seconds per drawing against the constant-image floor. *Gate: beats the floor
+   by 2× MSE and finishes in ≤ 2 s.* *Kill: both at the floor — then "images"
+   means reconstruction, not generation, and the page says so.* Result: 0.55×
+   the floor (60% of the representable gain) at 0.48 s for the fill loop, 0.81×
+   (25%) at 0.36 s for the decoder. The gate is missed; the kill's condition is
+   not literally met, so the page says that instead.
 7. **One trunk, two alphabets.** A single decoder-only transformer with a byte
    embedding and a patch embedding, geometry bias only in the patch attention
    (R0's lesson: geometry is a query prior). With step 5 cut, the code side is
@@ -615,6 +618,82 @@ prompts and on all 40 frozen tasks; held-out bits/byte moves 2.4777 → 2.4782
 Gate: 1,075 >= 1,000 B/s single-thread, +0.02% <= 1%, 0.42 MB <= 25 MB. Met. A
 96-byte completion takes 89 ms; four at once take 47 ms each. That is enough for
 a demo and is not a chat model.
+
+### Step 6, measured: both candidates missed the gate
+
+Two candidates, the 36 frozen drawings (12 per layout), one renderer, one
+scoring path. `tools/draw_gen.py` scores the GNN's fill loop,
+`tools/ar_patches.py` scores the AR patch decoder, and both report two controls:
+
+* **floor** — the pixel-wise mean of 64 *training* drawings: the standard
+  "predict the average image" baseline.
+* **ceiling** — the drawing's own patches pushed through the same renderer. No
+  model that emits one 4x4 patch per node can beat this, because the ink
+  *between* nodes is not in its output space. Without it, "beats the floor by
+  2x" cannot be read: on the chart the ceiling is 0.17x the floor and 2x is
+  easy, on hex it is 0.39x and 2x asks for 67% of everything available.
+
+The useful number is therefore **gain captured**, (floor - mse) / (floor -
+ceiling). MSE and r are on covered pixels only (33.2% of a synthetic canvas; the
+renderer leaves the rest black, which is the renderer's hole, not the model's).
+
+| layout | nodes | floor | ceiling | A: fill, 8 passes | gain | B: AR codes | gain |
+|---|---|---|---|---|---|---|---|
+| hex | 203 | 0.0467 | 0.0181 | **0.0350** (r 0.493) | 41% | 0.0444 (r 0.327) | 8% |
+| rings | 61 | 0.0302 | 0.0107 | **0.0241** (r 0.476) | 32% | 0.0465 (r 0.306) | -83% |
+| chart | 25 | 0.1119 | 0.0189 | **0.0457** (r 0.681) | 71% | 0.0622 (r 0.538) | 53% |
+| all | 96 | 0.0629 | 0.0159 | **0.0349** (0.55x floor) | 60% | 0.0510 (0.81x) | 25% |
+
+Seconds per drawing, one thread, idle device: A 0.48 s (16 passes 0.96 s), B
+0.36 s. Both pass the time bar; neither passes 0.50x floor. The gate is missed
+by both, and the pre-registered kill's literal condition ("both at the floor")
+is *not* met: A is 1.8x better than the floor and captures 60% of what the
+representation allows, so "images means reconstruction, not generation" would
+overstate the negative too. What is closed is the claim that either candidate
+*is* a drawing generator at this size.
+
+**Three explanations for A's miss, each tested and each refuted.**
+
+1. *It was trained on photographs.* The photo-trained checkpoints score 0.0885
+   on the same drawings (1.41x floor, r -0.047, gain -54%): they do not
+   transfer at all, and training on synthetic drawings is what moves 1.41x to
+   0.55x. Necessary, not sufficient.
+2. *The fill loop's first pass is out of distribution.* `synth_gnn.py` sampled
+   mask ratios 0.1-0.9, while a fill from empty starts at 1.0. Retrained with
+   masks up to 1.0 (`runs/synth-gnn-empty`, `--mask-max 0.9` reproduces the
+   first run): 0.0350, 0.56x floor, 59% gain. Inside noise of 0.0349 — the
+   mismatch was real and it did not matter.
+3. *The loop conditions on its own predictions and was never trained to.*
+   `--teacher` runs the same loop but reveals the true patch after every pass,
+   keeping the model's answer for the cells being scored. Result: 0.0349, the
+   same to four decimals, and the largest change in the model's own output is
+   0.0093 on a 0-1 range. The model is a low-pass filter: feeding it its own
+   0.118-mean-error predictions barely moves its answer, so drift is not the
+   limiter. Per-cell accuracy is.
+
+**Candidate B, the AR patch decoder**, matched at 372,513 parameters (dim 96,
+depth 3, 8 epochs x 125 steps, 1.6 M patch codes): 4.891 bits/code at 15.4%
+accuracy, versus R0's 4.534 for a raster-index arm trained on less — so it is
+worse per code as well as worse per drawing. Greedy decoding gives 0.83x floor
+(23% gain) against 0.81x (25%) sampled, so decoding is not the problem. Rings is
+worse than the floor: 61 tokens give a causal model almost no context to
+condition on. Its one win is speed, 0.36 s against A's 0.48 s.
+
+**What is closed and what stays open.** Closed: "a 405 k GNN draws these
+drawings", "an AR patch decoder is the better small generator", and "the fill
+loop's own error compounding is why the numbers stop at 0.55x". Open, and what
+step 7 inherits: the missing 40% of the gap is per-cell prediction quality at
+405 k parameters and 1,500 steps, and step 7's gate is a *delta* against a
+two-model control, so it can be scored on these numbers without pretending they
+are good.
+
+Two methodology notes that belong with the numbers. The scoring tool pins
+`OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1` before torch loads, because the same
+run takes 0.48 s at one OpenMP thread and 2.15 s at the default eight. And the
+frozen drawings are checked for leakage against B's training set (nearest
+training drawing, largest per-node patch difference, 0-1 scale): hex 0.51, rings
+0.38, chart 0.40. `tools/ar_patches.py --resume` re-scores a saved model and
+writes the same JSON.
 
 ## Non-goals, stated once
 

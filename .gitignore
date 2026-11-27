@@ -6,6 +6,8 @@ runs/**/*.pt
 !runs/main-hex/model.pt
 !runs/main-rings/model.pt
 !runs/main-chart/model.pt
+!runs/synth-gnn/model.pt
+!runs/ar-patches/model.pt
 runs/energy/*.png
 runs/energy-*/*.png
 runs/seq/*.png

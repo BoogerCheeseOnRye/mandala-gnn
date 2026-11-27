@@ -220,6 +220,32 @@ def main() -> None:
             check(lm.generate(prompts, 8) == ref_bytes,
                   f"numpy sampler: int8={int8} reproduces torch's greedy bytes")
 
+    # step 6 scoring: uncovered corners must not be scored, and the score has
+    # to say "perfect" for a perfect image
+    from tools.draw_gen import render, score
+
+    p6, c6, img6 = sample("hex", torch.Generator().manual_seed(3))
+    out6, covered = render(p6, c6)
+    frac = float(covered.float().mean())
+    check(0.0 < frac <= 1.0, f"draw: coverage mask covers {frac:.0%} of the canvas")
+    perfect = score(img6, img6, covered)
+    check(abs(perfect["mse"]) < 1e-12 and abs(perfect["r"] - 1.0) < 1e-6,
+          "draw: an exact image scores MSE 0 and r 1")
+    check(score(torch.zeros_like(img6), img6, covered)["mse"] > 0,
+          "draw: a blank image scores worse than exact")
+
+    # cached sequence decoding: the ar-patches candidate depends on it
+    sq = SeqLM(vocab=32, dim=32, depth=2, heads=4, pos="abs2d", dropout=0.0).eval()
+    tok = torch.randint(0, 32, (2, 10))
+    co = torch.rand(2, 10, 2) * 2 - 1
+    with torch.no_grad():
+        full = sq(tok, co)
+        head, cache = sq.forward_cached(tok[:, :6], co[:, :6])
+        tail, _ = sq.forward_cached(tok[:, 6:], co[:, 6:], cache)
+    check(float((head - full[:, :6]).abs().max()) < 1e-5
+          and float((tail - full[:, 6:]).abs().max()) < 1e-5,
+          "seq: cached decoding matches the full forward")
+
     dead = recon_example(DRAWING, mesh="none", size=64, seed=0)
     mlp = MandalaNet(in_dim=dead.patch_dim + 1, out_dim=dead.patch_dim, dim=16,
                      depth=2, blocks=1)

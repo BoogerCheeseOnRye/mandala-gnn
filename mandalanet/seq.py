@@ -93,6 +93,29 @@ class Block(nn.Module):
         x = x + self.out(a.transpose(1, 2).reshape(b, n, -1))
         return x + self.ff(self.ln2(x))
 
+    def forward_cached(self, x: torch.Tensor, past):
+        """One or more new tokens against a (k, v) cache, no pair bias."""
+        assert self.bias is None, "cached decoding does not carry the pair bias"
+        b, n, _ = x.shape
+        q, k, v = self.qkv(self.ln1(x)).view(b, n, 3, self.heads, self.dh).permute(2, 0, 3, 1, 4)
+        if past is not None:
+            k = torch.cat([past[0], k], dim=2)
+            v = torch.cat([past[1], v], dim=2)
+        if n == 1 and past is not None:
+            mask = None
+        else:
+            total = k.shape[2]
+            mask = torch.zeros(n, total, device=x.device, dtype=x.dtype)
+            mask[:, total - n:] = torch.triu(
+                torch.full((n, n), float("-inf"), device=x.device, dtype=x.dtype),
+                diagonal=1)
+            mask = mask[None, None]
+        a = F.scaled_dot_product_attention(
+            q, k, v, attn_mask=mask,
+            dropout_p=self.drop if self.training else 0.0)
+        x = x + self.out(a.transpose(1, 2).reshape(b, n, -1))
+        return x + self.ff(self.ln2(x)), (k, v)
+
 
 class SeqLM(nn.Module):
     def __init__(self, vocab: int, dim: int = 96, depth: int = 3, heads: int = 4,
@@ -150,6 +173,24 @@ class SeqLM(nn.Module):
         for block in self.blocks:
             x = block(x, feats, causal)
         return self.head(self.ln_f(x))
+
+    def forward_cached(self, idx: torch.Tensor, coords: torch.Tensor, cache=None):
+        """Incremental forward. `coords` are the positions of the new tokens."""
+        assert self.pos in ("none", "abs1d", "abs2d"), \
+            "cached decoding is wired for the position-only arms"
+        b, n = idx.shape
+        offset = 0 if cache is None else cache[0][0].shape[2]
+        x = self.tok(idx)
+        if self.pos == "abs1d":
+            x = x + self.pos1d(torch.arange(offset, offset + n, device=idx.device))[None]
+        elif self.pos == "abs2d":
+            x = x + self.pos2d(self.pos_features(coords))
+        x = self.drop(x)
+        new = []
+        for i, block in enumerate(self.blocks):
+            x, kv = block.forward_cached(x, None if cache is None else cache[i])
+            new.append(kv)
+        return self.head(self.ln_f(x)), new
 
     def n_params(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)

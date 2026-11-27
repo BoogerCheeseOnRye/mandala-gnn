@@ -241,6 +241,97 @@ more informative — is not the problem a search loop has.
 
 ![S: pairwise accuracy per candidate family, and what the head captures of the available gain](img/energy-selector.png)
 
+## Images and code generation: the ten-step branch
+
+The branch's target is one small model that both draws and writes code, inside a
+stated envelope: **≤ 5 M parameters, ≤ 25 MB int8, ≥ 1 kB/s on this phone, ≤ 2 s
+to finish a drawing**. Each step below was pre-registered with a gate and a kill
+in [ROADMAP.md](https://github.com/BoogerCheeseOnRye/mandala-gnn/blob/main/ROADMAP.md#images-and-code-generation-ten-steps-small-and-fast);
+a missed gate fires its kill instead of a retry at a slightly better setting.
+
+| step | what was measured | gate | outcome |
+|---|---|---|---|
+| 1 | meter: 385 k byte model at 2.4777 bits/byte, 79 B/s; 405 k GNN at wedge r 0.906, fill-from-empty r 0.360 vs 0.287 floor | table exists | met |
+| 2 | 40 docstring tasks with unit tests + 36 held-out drawings, one SHA | sha verifies, all references pass | met |
+| 3 | capacity 1.26 M → 2.296 bits/byte; 3x tokens → 2.156 bits/byte | body compiles, test passes | **missed: 0 of 40 both arms** |
+| 4 | numpy int8 decode of the same weights | ≥ 1 kB/s | met: 1,075 B/s |
+| 5 | conditional code | — | **cut** by step 3's kill |
+| 6 | GNN fill loop vs AR patch decoder on 36 drawings | 2x the floor, <= 2 s | **missed: 0.55x and 0.81x** (both <= 1 s) |
+
+Two things about the code side are worth stating plainly. First, held-out
+bits/byte falls monotonically with parameters and tokens (2.478 → 2.296 →
+2.156) while the task metric stays at zero: at this budget the model is a
+completion model, and a completion model is not a function body. Second, the
+naive `compile()` check says 40 of 40 tasks "compile", because a body of spaces
+is valid Python; the metric used here is "a statement that is not a string
+literal", which is 0 of 40. That tightening is why step 3 is closed rather than
+ambiguous.
+
+Step 4's speed came from moving the sampler out of torch:
+
+| runtime (1 thread, 96 bytes) | 1 stream | 4 streams |
+|---|---|---|
+| torch, full window per byte | 87 B/s | — |
+| torch, KV cache, oneDNN on | — | 445 B/s |
+| torch, KV cache | — | 737 B/s |
+| numpy, int8 weights | **1,075 B/s** | **2,032 B/s** (1,464 sampled) |
+
+A (1, 96) x (96, 288) matmul costs 400–1,400 µs through oneDNN on this device and
+~24 µs with oneDNN disabled; one cached torch step makes ~230 aten calls, so the
+floor is dispatch, not arithmetic. The numpy sampler makes ~230 numpy calls at
+~2.8 µs each. Folding each layer norm's affine into the matmul that follows it
+and rope into a single 24x24 matmul took the same weights from 433 to 1,075 B/s.
+The OpenMP thread count is not a detail: at the default eight threads every tiny
+matmul pays a pool wake-up and the loop runs at 754 B/s.
+
+Equivalence was checked, because a fast sampler that generates different bytes
+is worthless: fp32 logits match torch to 5.7e-6, int8 logits differ by up to
+0.08 but give byte-identical greedy output on the four meter prompts and all 40
+frozen tasks, and held-out bits/byte moves 2.4777 → 2.4782.
+
+### Step 6, the drawing generator
+
+Same 36 frozen drawings, same renderer, same scoring for both candidates. Two
+controls make the numbers readable: the **floor** is the mean of 64 *training*
+drawings, and the **ceiling** is the drawing's own patches pushed through the
+same renderer — a model that emits one 4x4 patch per node cannot paint the ink
+between nodes, so that is the best it can do. The informative number is the
+share of that gap a candidate closes.
+
+| layout | floor | ceiling | GNN fill, 8 passes | gain | AR patch codes | gain |
+|---|---|---|---|---|---|---|
+| hex | 0.0467 | 0.0181 | **0.0350** (r 0.493) | 41% | 0.0444 (r 0.327) | 8% |
+| rings | 0.0302 | 0.0107 | **0.0241** (r 0.476) | 32% | 0.0465 (r 0.306) | -83% |
+| chart | 0.1119 | 0.0189 | **0.0457** (r 0.681) | 71% | 0.0622 (r 0.538) | 53% |
+| all | 0.0629 | 0.0159 | **0.0349** | 60% | 0.0510 | 25% |
+
+Seconds per drawing on one thread: 0.48 s for the fill loop, 0.36 s for the
+decoder. Both pass the 2 s bar; neither reaches 0.50x the floor, so the gate is
+missed by both and the page claims no drawing generator.
+
+![S: the drawing, the mean-image floor, and what each candidate produces from nothing](img/draw-gen-gnn.png)
+
+Three candidate explanations for the fill loop's miss, each tested:
+
+* **Transfer, not ability.** The photo-trained checkpoints score 0.0885 (1.41x
+  the floor, r -0.047) on the same drawings. Training on synthetic drawings is
+  what moves that to 0.55x; it is necessary and not sufficient.
+* **An out-of-distribution first pass.** Training sampled masks up to 0.9, but a
+  fill from empty starts at 1.0. Retrained to include the empty canvas: 0.0350,
+  inside noise. Real mismatch, no effect.
+* **Error compounding.** The loop conditions on its own output and was never
+  trained to. Revealing the true patch after every pass changes the score by
+  nothing (0.0349 either way; the model's own output moves by 0.009 on a 0-1
+  range). It is a low-pass filter, so drift is not the limiter — per-cell
+  accuracy is.
+
+The decoder loses on quality and wins on speed: 4.891 bits/patch-code at 15.4%
+accuracy (R0's raster-index arm reached 4.534 on fewer steps), 0.81x the floor
+sampled and 0.83x greedy, and worse than the floor on rings, where 61 tokens
+leave a causal model almost no context.
+
+![S: the same drawings against the AR patch-code decoder](img/draw-gen-ar.png)
+
 ## Caveats
 
 * One drawing, two seeds, 300-400 steps. Differences under ~0.02 r are noise;
